@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+{% load dajaxice_templatetags %}
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" contet="width=device-width, initial-scale=1.0">
+		<title>WSP Triple Editor</title>
+	 	{% dajaxice_js_import %}	
+		{% load staticfiles %}
+		<link rel="stylesheet" type="text/css" href="{% static 'rdfedit/bootstrap/css/bootstrap.css' %}" />
+		<link rel="stylesheet" type="text/css" href="{% static 'rdfedit/bootstrap/css/bootstrap-fileupload.css' %}" />
+		<link rel="stylesheet" type="text/css" href="{% static 'rdfedit/jQuery-UI/jquery-ui.css' %}" />
+		<link rel="stylesheet" type="text/css" href="{% static 'rdfedit/css/rdfedit-base.css' %}" />
+		<link rel="stylesheet" type="text/css" href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css">
+		<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700,300italic,400italic,500italic,700italic">
+		<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,300,400,600,700,800">
+		
+	
+		<script src="{% static 'rdfedit/jQuery/jquery-2.0.3.min.js' %}"></script>
+		<script src="{% static 'rdfedit/jQuery-UI/jquery-ui.js' %}"></script>
+		<script src="{% static 'rdfedit/bootstrap/js/bootstrap.js' %}"></script>
+		<script src="{% static 'rdfedit/bootstrap/js/bootstrap-fileupload.js' %}"></script>
+		<script src="{% static 'rdfedit/jQuery/jquery-bootstrap-upload-button.js' %}"></script>
+		
+		{% block templatescripts %} {% endblock %}
+	
+  </head>
+  
+  <body>
+	<!-- Navigation bar -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+		<button type="button" class="btn btn-navbar"
+				data-toggle="collapse" data-target=".nav-collapse">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+		</button>
+		<a class="brand" href="{% url "index" %}">WSP Triple Editor</a>
+		<div class="nav-collapse collapse">
+			<ul class="nav">
+				<li class="active"><a href="{% url "index" %}">Home</a></li>
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">Tools <b class="caret"></b></a>
+					<ul class="dropdown-menu">
+                        {% block dropdown-tools %} {% endblock %}
+					</ul>
+				</li>
+			</ul>
+		</div>
+	  </div>
+	</div>
+
+    <div id="content">
+        {% block content %}{% endblock %}
+    </div>
+	
+	
+	
+  </body>
+</html>

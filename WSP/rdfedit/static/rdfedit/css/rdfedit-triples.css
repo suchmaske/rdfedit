@@ -1,0 +1,57 @@
+.edit {
+  background-color: #ffffff;
+  padding: 0px 0px 0px 0px;
+  font-size: 13px;
+  color: #555555;
+  border: 1px solid #2f96b4 !important;
+}
+
+
+td, th {
+	width: 400px !important;
+}
+
+
+thead, tfoot, #add_triple th {
+    	background-color: #EEEEEE;
+}
+
+#add_button, #delete_triple, #undo_button {
+	float:right;
+}
+
+#rdf_export_button {
+	margin-left: 10px;
+}
+
+#delete_triple i{
+	opacity:0.4;
+}
+
+#delete_triple:hover i{
+	opacity:1.0;
+}
+
+#triples tbody tr:hover {
+	background-color: #dddddd;
+}
+
+#triples tbody tr td:hover {
+	background-color: #bbbbbb;
+}
+
+#object-icon {
+	padding-right: 4px;
+}
+
+#undo_button {
+	margin-right: 10px;
+}
+
+.added {
+	background-color: #d6e9c6;
+}
+
+.deleted {
+	background-color: #eed3d7;
+}

@@ -1,0 +1,105 @@
+﻿<?xml version="1.0"?>
+<rdf:RDF
+    xmlns="http://wsp.bbaw.de/avh/Orinoco/"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:ore="http://www.openarchives.org/ore/terms/"
+    xmlns:dcterms="http://purl.org/dc/terms/"
+    xmlns:gnd="http://d-nb.info/standards/elementset/gnd#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xml:base="http://wsp.bbaw.de/avh/Orinoco/" > 
+  <rdf:Description rdf:about="http://wsp.bbaw.de/avh/Orinoco/ResourceMap_1">
+    <dc:creator rdf:resource="http://wsp.normdata.rdf/Wissensspeicher"/>
+    <dcterms:modified rdf:datatype="http://purl.org/dc/terms/W3CDTF">2013-03-12</dcterms:modified>
+    <rdf:type rdf:resource="http://www.openarchives.org/ore/terms/ResourceMap"/>
+    <dc:creator rdf:resource="http://wsp.normdata.rdf/Bruesemeister"/>
+    <dcterms:created rdf:datatype="http://purl.org/dc/terms/W3CDTF">2013-03-12</dcterms:created>
+    <ore:describes rdf:resource="http://wsp.bbaw.de/avh/Orinoco/Aggregation_1"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://wsp.bbaw.de/avh/Orinoco/QuelleEnglish">
+    <dcterms:bibliographicCitation rdf:datatype="http://www.w3.org/2001/XMLSchema#string">by Alexander von Humboldt, and Aimé Bonpland; with Maps, Plans &amp;c. Written in French by Alexander von Humboldt, and Translated into English by Helen Maria Williams. Vol. IV. – London: Longman, Hurst, Rees, Orme, and Brown 1819.</dcterms:bibliographicCitation>
+    <dcterms:issued rdf:datatype="http://purl.org/dc/terms/W3CDTF">1819</dcterms:issued>
+    <dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Personal Narrative of Travels to the Equinoctial Regions of the New Continent, During the Years 1799-1804</dc:title>
+    <gnd:author rdf:resource="http://wsp.normdata.rdf/HumboldtAlexander"/>
+    <rdf:type rdf:resource="http://purl.org/dc/terms/BibliographicResource"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://wsp.bbaw.de/avh/Orinoco/Tagebuch">
+    <rdf:type rdf:resource="http://www.openarchives.org/ore/terms/AggregatedResource"/>
+    <dc:format rdf:datatype="http://purl.org/dc/terms/IMT">text/html</dc:format>
+    <dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Tagebuch</dc:title>
+    <dc:identifier rdf:resource="http://www.bbaw.de/forschung/avh/orinoco/diary/diary_240.html"/>
+    <dc:language rdf:resource="http://wsp.normdata.rdf/German"/>
+    <dc:language rdf:resource="http://wsp.normdata.rdf/Latin"/>
+    <ore:isAggregatedBy rdf:resource="http://wsp.bbaw.de/avh/Orinoco/Aggregation_1"/>
+    <dcterms:extent rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Seite 240-256</dcterms:extent>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://wsp.bbaw.de/avh/Orinoco/TagebuchFrench">
+    <rdf:type rdf:resource="http://www.openarchives.org/ore/terms/AggregatedResource"/>
+    <dc:format rdf:datatype="http://purl.org/dc/terms/IMT">text/html</dc:format>
+    <dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Voyage aux régions équinoxiales du Nouveau Continent, LIVRE VI, CHAPITRE XIII.</dc:title>
+    <dc:language rdf:resource="http://wsp.normdata.rdf/French"/>
+    <ore:isAggregatedBy rdf:resource="http://wsp.bbaw.de/avh/Orinoco/Aggregation_1"/>
+    <dcterms:extent rdf:datatype="http://www.w3.org/2001/XMLSchema#string">[212]-[252]</dcterms:extent>
+    <dcterms:isVersionOf rdf:resource="http://wsp.bbaw.de/avh/Orinoco/TagebuchDeutsch"/>
+    <dc:identifier rdf:resource="http://www.bbaw.de/forschung/avh/orinoco/texte/french.html"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://wsp.bbaw.de/avh/Orinoco/TagebuchDeutsch">
+    <dcterms:temporal rdf:datatype="http://purl.org/dc/terms/Period">start=1799; end=1804; name=Reisejahre</dcterms:temporal>
+    <dc:identifier rdf:resource="http://www.bbaw.de/forschung/avh/orinoco/texte/german.html"/>
+    <ore:isAggregatedBy rdf:resource="http://wsp.bbaw.de/avh/Orinoco/Aggregation_1"/>
+    <dc:language rdf:resource="http://wsp.normdata.rdf/German"/>
+    <rdf:type rdf:resource="http://www.openarchives.org/ore/terms/AggregatedResource"/>
+    <dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Reise in die Aequinoctial-Gegenden des neuen Continents in den Jahren 1799, 1800, 1801, 1802, 1803 und 1804</dc:title>
+    <dcterms:extent rdf:datatype="http://www.w3.org/2001/XMLSchema#string">[361]-[431]</dcterms:extent>
+    <dc:format rdf:datatype="http://purl.org/dc/terms/IMT">text/html</dc:format>
+    <dc:source rdf:resource="http://wsp.bbaw.de/avh/Orinoco/QuelleDeutsch"/>
+    <dcterms:hasVersion rdf:resource="http://wsp.bbaw.de/avh/Orinoco/TagebuchEnglish"/>
+    <dcterms:hasVersion rdf:resource="http://wsp.bbaw.de/avh/Orinoco/TagebuchFrench"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://wsp.bbaw.de/avh/Orinoco/QuelleDeutsch">
+    <dcterms:bibliographicCitation rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Verfasst von Alexander von Humboldt und A. Bonpland. Dritter Theil. Stuttgart und Tübingen, in der J. G. Cotta'schen Buchhandlung</dcterms:bibliographicCitation>
+    <dcterms:issued rdf:datatype="http://purl.org/dc/terms/W3CDTF">1820</dcterms:issued>
+    <dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Reise in die Aequinoctial-Gegenden des neuen Continents in den Jahren 1799, 1800, 1801, 1802, 1803 und 1804</dc:title>
+    <gnd:author rdf:resource="http://wsp.normdata.rdf/HumboldtAlexander"/>
+    <rdf:type rdf:resource="http://purl.org/dc/terms/BibliographicResource"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://wsp.bbaw.de/avh/Orinoco/Aggregation_1">
+    <gnd:editor rdf:resource="http://wsp.normdata.rdf/Leitner"/>
+    <dcterms:abstract rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Auszug aus dem Tagebuch der Orinoco-Reise</dcterms:abstract>
+    <gnd:editor rdf:resource="http://wsp.normdata.rdf/Siebers"/>
+    <dc:language rdf:resource="http://wsp.normdata.rdf/German"/>
+    <ore:isDescribedBy rdf:resource="http://wsp.bbaw.de/avh/Orinoco/ResourceMap_1"/>
+    <dc:type rdf:datatype="http://purl.org/dc/terms/DCMIType">Text</dc:type>
+    <dcterms:spatial rdf:resource="http://wsp.normdata.rdf/Orinoco"/>
+    <dc:language rdf:resource="http://wsp.normdata.rdf/English"/>
+    <dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">"Alles ist Wechselwirkung"  Alexander von Humbold am Orinoco (31. März-7. April 1800)</dc:title>
+    <gnd:editor rdf:resource="http://wsp.normdata.rdf/Griep"/>
+    <ore:aggregates rdf:resource="http://wsp.bbaw.de/avh/Orinoco/TagebuchEnglish"/>
+    <dc:format rdf:datatype="http://purl.org/dc/terms/IMT">text/html</dc:format>
+    <ore:aggregates rdf:resource="http://wsp.bbaw.de/avh/Orinoco/TagebuchDeutsch"/>
+    <ore:aggregates rdf:resource="http://wsp.bbaw.de/avh/Orinoco/TagebuchFrench"/>
+    <rdf:type rdf:resource="http://www.openarchives.org/ore/terms/Aggregation"/>
+    <ore:aggregates rdf:resource="http://wsp.bbaw.de/avh/Orinoco/Tagebuch"/>
+    <dc:language rdf:resource="http://wsp.normdata.rdf/French"/>
+    <dc:identifier rdf:resource="http://www.bbaw.de/forschung/avh/orinoco/index.html"/>
+    <gnd:editor rdf:resource="http://wsp.normdata.rdf/Mrochen"/>
+    <dcterms:temporal rdf:datatype="http://purl.org/dc/terms/Period">start=1800-03-31; end=1800-04-07; name=Tagebuchzeitraum</dcterms:temporal>
+    <dcterms:issued rdf:datatype="http://purl.org/dc/terms/W3CDTF">2005</dcterms:issued>
+    <gnd:formOfWorkAndExpression rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Digitale Edition</gnd:formOfWorkAndExpression>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://wsp.bbaw.de/avh/Orinoco/TagebuchEnglish">
+    <dc:source rdf:resource="http://wsp.bbaw.de/avh/Orinoco/QuelleEnglish"/>
+    <rdf:type rdf:resource="http://www.openarchives.org/ore/terms/AggregatedResource"/>
+    <ore:isAggregatedBy rdf:resource="http://wsp.bbaw.de/avh/Orinoco/Aggregation_1"/>
+    <dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Personal Narrative of Travels to the Equinoctial Regions of the New Continent, During the Years 1799-1804</dc:title>
+    <dc:format rdf:datatype="http://purl.org/dc/terms/IMT">text/html</dc:format>
+    <dc:identifier rdf:resource="http://www.bbaw.de/forschung/avh/orinoco/texte/english.html"/>
+    <dcterms:temporal rdf:datatype="http://purl.org/dc/terms/Period">start=1799; end=1804; name=Reisejahre</dcterms:temporal>
+    <dcterms:isVersionOf rdf:resource="http://wsp.bbaw.de/avh/Orinoco/TagebuchDeutsch"/>
+    <dc:language rdf:resource="http://wsp.normdata.rdf/English"/>
+    <dcterms:extent rdf:datatype="http://www.w3.org/2001/XMLSchema#string">[419]-[500]</dcterms:extent>
+  </rdf:Description>
+</rdf:RDF>
+

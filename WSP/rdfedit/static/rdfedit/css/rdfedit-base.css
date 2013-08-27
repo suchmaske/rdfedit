@@ -1,0 +1,46 @@
+	/* Body and heading */
+
+	body{
+		font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+		padding-top: 60px;
+	}
+	
+	.heading, .subheading{
+		font-family: 'Ubuntu', Helvetica, Arial, sans-serif;
+		text-align: center
+	}
+	
+	p.lead {
+		padding-top: 1.5%;
+		font-size: 24px;
+		line-height: 30px;
+	}
+	
+	p {
+		font-size: 18px;
+		line-height: 24px;
+	}
+	
+	/* Enable dropdown on hover */
+	
+	ul.nav li.dropdown:hover ul.dropdown-menu { 
+		display: block; 
+	}
+
+	/* Style upload button */
+
+	#id_docfile {
+	   display: none;
+	}
+   
+	.dummyfile input[type="text"] {
+		width: 120px;
+		display: inline;
+	}
+
+	.filehandler {
+		width: 600px;
+		float: left;
+		padding-top: 4px;
+		padding-left: 2px;
+	}

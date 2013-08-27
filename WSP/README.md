@@ -18,6 +18,3 @@ Todo:
 * Support more upload formats
 * Provide tests and setup files
 * Spring cleaning
-
-License:
-CC-BY-SA

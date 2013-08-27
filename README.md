@@ -9,12 +9,16 @@ With rdfedit you currently can:
 
 Prequisites:
 * Django 1.5.1
-** Dajaxice http://www.dajaxproject.com/
-** rdflib https://github.com/RDFLib/rdflib
-** rdflib-jsonld https://github.com/RDFLib/rdflib-jsonld
-** rdflib-sparql
+	* Dajaxice http://www.dajaxproject.com/
+	* rdflib https://github.com/RDFLib/rdflib
+	* rdflib-jsonld https://github.com/RDFLib/rdflib-jsonld
+	* rdflib-sparql
 
 Todo:
 * Support more upload formats
 * Provide tests and setup files
 * Spring cleaning
+
+My example Instance:
+
+Go to: http://ec2-54-213-21-249.us-west-2.compute.amazonaws.com:8080/rdfedit/index/ and click the example button.

@@ -9,10 +9,10 @@ With rdfedit you currently can:
 
 Prequisites:
 * Django 1.5.1
-** Dajaxice http://www.dajaxproject.com/
-** rdflib https://github.com/RDFLib/rdflib
-** rdflib-jsonld https://github.com/RDFLib/rdflib-jsonld
-** rdflib-sparql
+  * Dajaxice http://www.dajaxproject.com/
+  * rdflib https://github.com/RDFLib/rdflib
+  * rdflib-jsonld https://github.com/RDFLib/rdflib-jsonld
+  * rdflib-sparql
 
 Todo:
 * Support more upload formats

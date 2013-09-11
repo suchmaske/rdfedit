@@ -140,8 +140,6 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'WSP.rdfedit',
     'widget_tweaks',
-    'grappelli',
-    'filebrowser',
     'dajaxice',
 )
 

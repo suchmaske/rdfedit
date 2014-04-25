@@ -1,0 +1,10 @@
+{
+ "foaf:person" : {
+ 
+ 	"dbpprop:author" : "dc:creator",
+ 	"foaf:name" : "foaf:name"
+ 	
+ 	
+ 	}
+
+}

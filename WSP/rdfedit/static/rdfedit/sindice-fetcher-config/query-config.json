@@ -1,0 +1,10 @@
+{
+
+"foaf:person" : {
+
+	"fq=domain" : "dbpedia",
+	"fq=class" : "foaf:person"
+
+	}
+
+}

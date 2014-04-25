@@ -55,6 +55,11 @@ USE_TZ = True
 # Example: "/var/www/example.com/media/"
 MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
 
+# Get the sindice config directory
+SINDICE_API_URL = "http://api.sindice.com/v3/search?"
+SINDICE_CONFIG_QUERY = os.path.join(PROJECT_ROOT, 'rdfedit/static/rdfedit/sindice-fetcher-config/query-config.json')
+SINDICE_CONFIG_MAPPING = os.path.join(PROJECT_ROOT, 'rdfedit/static/rdfedit/sindice-fetcher-config/mapping-config.json')
+
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://example.com/media/", "http://media.example.com/"
@@ -170,6 +175,28 @@ LOGGING = {
             'propagate': True,
         },
     }
+}
+
+NAMESPACES_DICT = {
+"dc":"http://purl.org/dc/elements/1.1/",
+"DOLCE-Lite":"http://www.loa-cnr.it/ontologies/DOLCE-Lite.owl#",
+"foaf":"http://xmlns.com/foaf/0.1/",
+"ore":"http://www.openarchives.org/ore/terms/",
+"dcmitype":"http://purl.org/dc/dcmitype/",
+"rdfs":"http://www.w3.org/2000/01/rdf-schema#",
+"xsd":"http://www.w3.org/2001/XMLSchema#",
+"owl":"http://www.w3.org/2002/07/owl#",
+"rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+"cidoc_crm_v5":"http://www.cidoc-crm.org/rdfs/cidoc_crm_v5.0.2_english_label.rdfs#",
+"core":"http://purl.org/vocab/frbr/core#",
+"dcterms":"http://purl.org/dc/terms/",
+"skos":"http://www.w3.org/2004/02/skos/core#",
+"vs":"http://www.w3.org/2003/06/sw-vocab-status/ns#",
+"gnd":"http://d-nb.info/standards/elementset/gnd#",
+"edm":"http://www.europeana.eu/schemas/edm/",
+"wsp":"http://wsp.normdata.rdf/",
+"dbpedia": "http://dbpedia.org/resource/",
+"dbpprop": "http://dbpedia.org/property/"
 }
 
 

@@ -9,7 +9,9 @@ from WSP.rdfedit.views import getrdf
 from WSP.rdfedit.models import RDF_XML, Document
 from WSP.rdfedit.spo2rdfjson import spo2rdfjson
 
-from rdflib import Graph, plugin
+from WSP.settings import SINDICE_CONFIG_QUERY, SINDICE_CONFIG_MAPPING, SINDICE_API_URL, NAMESPACES_DICT
+
+from rdflib import Graph, plugin, URIRef
 from rdflib.parser import Parser
 from rdflib.serializer import Serializer
 from rdflib.namespace import Namespace, NamespaceManager
@@ -17,27 +19,14 @@ from rdflib.plugins.serializers.rdfxml import PrettyXMLSerializer
 
 import rdflib
 import cStringIO as StringIO
+import urllib2
+
+import django.contrib.staticfiles
 
 plugin.register("rdf-json", Parser,
    "rdflib_rdfjson.rdfjson_parser", "RdfJsonParser")
 
-namespaces_dict = {
-"dc":"http://purl.org/dc/elements/1.1/",
-"DOLCE-Lite":"http://www.loa-cnr.it/ontologies/DOLCE-Lite.owl#",
-"foaf":"http://xmlns.com/foaf/0.1/",
-"ore":"http://www.openarchives.org/ore/terms/",
-"dcmitype":"http://purl.org/dc/dcmitype/",
-"rdfs":"http://www.w3.org/2000/01/rdf-schema#",
-"xsd":"http://www.w3.org/2001/XMLSchema#",
-"owl":"http://www.w3.org/2002/07/owl#",
-"rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-"cidoc_crm_v5":"http://www.cidoc-crm.org/rdfs/cidoc_crm_v5.0.2_english_label.rdfs#",
-"core":"http://purl.org/vocab/frbr/core#",
-"dcterms":"http://purl.org/dc/terms/",
-"skos":"http://www.w3.org/2004/02/skos/core#",
-"vs":"http://www.w3.org/2003/06/sw-vocab-status/ns#",
-"gnd":"http://d-nb.info/standards/elementset/gnd#",
-"edm":"http://www.europeana.eu/schemas/edm/" }
+namespaces_dict = NAMESPACES_DICT
 
 @dajaxice_register(method = 'POST')
 def serialize_graph(request, rdfjson, base):
@@ -66,3 +55,130 @@ def serialize_graph(request, rdfjson, base):
     graphxml_to_db.save()
 
     return simplejson.dumps({'message':graphxml_to_db.id}) 
+
+@dajaxice_register(method = 'POST')
+def query_sindice(request, keywords, type):
+    
+    sindice_query = build_sindice_query(keywords, type)
+        
+    graph = fetch_triples(sindice_query, type)
+    
+    #graph_rdfjson = graph.serialize(format="rdf-json")
+    
+    return simplejson.dumps({"fetched_triples": graph})
+
+def build_sindice_query(keywords, type):
+    # Build the basic query
+    query = SINDICE_API_URL
+    
+    # Create a query dictionary
+    query_dict = dict()
+    
+    # Replace the whitespace with +
+    query_dict["q"] = keywords.rstrip().replace(" ", "+")
+    query_dict["format"] = "json"
+    
+    # Read the query config
+    query_config = simplejson.loads(open(SINDICE_CONFIG_QUERY, 'r').read())
+    
+    if type in query_config:
+        type_config = query_config[type]
+        
+        for parameter in type_config:
+            query_dict[parameter] = type_config[parameter]
+        
+    # Iterable variable
+    query_parameters_counter = 0
+
+    # Build the query URL by iterating over the query dict
+    for query_parameter in query_dict:
+    
+        # increment the iterable
+        query_parameters_counter += 1
+        
+        # Adapt the query
+        if "=" in query_parameter:
+            query += query_parameter + ":" + query_dict[query_parameter]
+        else:
+            query += query_parameter + "=" + query_dict[query_parameter]
+            
+        # Add & if appropriate
+        if query_parameters_counter < len(query_dict):
+            query += "&"
+    
+    return query
+
+def fetch_triples(sindice_query, type):
+    
+    print sindice_query
+    
+    # Get the mapping
+    query_mapping = simplejson.loads(open(SINDICE_CONFIG_MAPPING, 'r').read())
+    
+    # Create a new graph
+    new_graph = Graph()
+    
+    # Bind namespaces to the graph
+    for ns in namespaces_dict:
+        new_graph.bind(ns, Namespace(namespaces_dict[ns]))
+    
+    if type in query_mapping:
+        
+        # Get the mapping for the particular type
+        type_mapping = query_mapping[type]
+    
+        # Load the request from the query
+        request = urllib2.urlopen(sindice_query, None)
+
+        # Parse the result into a json variable
+        result = simplejson.loads(request.read())
+        
+        result_counter = 0
+        rdf_hit = False
+        hit_link = ""
+        
+        while (rdf_hit == False and result_counter < len(result)):
+            hit = result["entries"][result_counter]
+            hit_format = hit["formats"]
+            if "RDF" in hit_format:
+                rdf_hit = True
+                hit_link = hit["link"]
+                
+            
+            result_counter += 1
+        
+        # Load the external graph
+        external_graph = Graph()
+        
+        try:
+            external_graph.load(URIRef(hit_link))
+        except:
+            print "URI unreachable"
+        
+        for ns in namespaces_dict:
+            external_graph.bind(ns, Namespace(namespaces_dict[ns    ]))
+        
+        # Iterate over the mappings
+        for orig_uri in type_mapping:
+
+            # Create a sparql query
+            sparql_query = 'select * where { ?s ' + orig_uri +  ' ?o .}'
+            
+            # Convert the prefix version into a full URIRef
+            new_uri_prefix = type_mapping[orig_uri].split(":")[0]
+            if new_uri_prefix in namespaces_dict:
+                new_uri = URIRef(type_mapping[orig_uri].replace(new_uri_prefix + ":", namespaces_dict[new_uri_prefix]))
+                
+            for row in external_graph.query(sparql_query):
+                print row   
+                new_graph.add((row.s, new_uri, row.o))
+        
+        # Get all triples from the new graph
+        triple_list = list()
+        spo_query = 'select * where {?s ?p ?o .}'
+        for row in new_graph.query(spo_query):
+            triple_list.append([row.s, row.p, row.o])
+    
+        return triple_list
+    
+        #return new_graph

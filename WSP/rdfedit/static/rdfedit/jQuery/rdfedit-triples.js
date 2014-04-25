@@ -70,7 +70,8 @@ function delete_triple(row, del_obj){
 	// Get subject content
 	var del_subject = triple_table.fnGetData(del_row[0], 0, 0);
 	del_subject = short_to_full_uri(del_subject);
-
+	console.log("DEL_S: " + Object.keys(rdfjson[del_subject]).length);
+	
 	// Get predicate content
 	var del_predicate = triple_table.fnGetData(del_row[0], 1, 1);
 	del_predicate = short_to_full_uri(del_predicate);
@@ -87,8 +88,8 @@ function delete_triple(row, del_obj){
 	// Push to action stack for later undoing
 	var action = {"action": "delete", "subject":del_subject, "predicate":del_predicate, "object":del_object_container};
 	action_stack.push(action);	
-
-	// Delete triple from the rdfjson object
+	
+	// Delete triple from the rdfjson object --> If subject-predicate has multiple objects
 	if (rdfjson[del_subject][del_predicate].length > 1){
 		var i=0;
 		var temp_array = rdfjson[del_subject][del_predicate]
@@ -99,22 +100,31 @@ function delete_triple(row, del_obj){
 			i = i + 1;	
 		});
 	}
+	
+	// Delete triple from the rdfjson object --> If subject-predicate has one object
+	else if (rdfjson[del_subject][del_predicate].length == 1) {
+		delete rdfjson[del_subject][del_predicate];
+	}
+	
+	// Delete the subject if it has no predicates and objects
+	if (Object.keys(rdfjson[del_subject]).length == 0) {
+		delete rdfjson[del_subject];
+	}
 
 	// Finally delete row from datatables object
 	var del_node = triple_table.fnGetNodes()[del_row[0]];
 	$(del_node).addClass("deleted");
 	window.setTimeout(function() {triple_table.fnDeleteRow(del_row[0]);}, 800);
 	
+	console.log(rdfjson);
+	
 }
 
 
-function add_triple(){
+function add_triple(new_subject, new_predicate, new_object){
 // Add new triple
 
 	// Read from the add_boxes
-	var new_subject = $("#add_subject").val();
-    var new_predicate = $("#add_predicate").val();
-	var new_object = $("#add_object").val();
 	
 	/* Check whether triple is valid. Subject and predicate have to be a URI */
 	var success = new Boolean(false);
@@ -189,6 +199,8 @@ function add_triple(){
 		var new_node = triple_table.fnGetNodes()[triple_table.fnSettings().fnRecordsTotal()-1];
 
 		triple_table.fnDisplayRow(new_node);
+		
+		console.log(rdfjson);
 
 	}	
 
@@ -375,6 +387,30 @@ function serialize_graph(){
 	Dajaxice.WSP.rdfedit.serialize_graph(js_graph_update, {'rdfjson':JSON.stringify(rdfjson), 'base':base});
 }
 
+/* This function initiates the sindice request by calling Django via AJAX */
+function fetch_triples() {
+	var keywords = $("#triple_set_keywords").val();
+	var type = $("#triple_set_type").val();
+
+	Dajaxice.WSP.rdfedit.query_sindice(implement_fetched_triples, {'keywords': keywords, 'type': type});
+}
+
+/* Return function of AJAX query_sindice */
+function implement_fetched_triples(data) {
+	//var fetched_triples = JSON.parse(data.fetched_triples)
+	var fetched_triples = data.fetched_triples;
+	
+	for (var i=0; i < fetched_triples.length; i++) {
+		
+		var current_triple = fetched_triples[i];
+		var new_subject = current_triple[0];
+		var new_predicate = current_triple[1];
+		var new_object = current_triple[2];
+		
+		add_triple(new_subject, new_predicate, new_object);
+	}
+}
+
 /* Autocomplete of input fields */
 
 
@@ -496,6 +532,8 @@ $(document).ready(function() {
 			"edm:",
 			"wsp:",
 			"dc:",
+			"dbpedia:",
+			"dbpprop"
 		];
 		
 		autocomplete_subject = availableNamespaces.concat(subject_set);
@@ -509,9 +547,19 @@ $(document).ready(function() {
 	
 	$("#undo_button, #dropdown_undo").click( function() { undo() });
 	
-	$("#add_button").click( function() { add_triple() });
+	$("#add_button").click( function() { 
+	
+		var new_subject = $("#add_subject").val();
+	    var new_predicate = $("#add_predicate").val();
+		var new_object = $("#add_object").val();
+		
+		add_triple(new_subject, new_predicate, new_object);
+		
+	});
 	
 	$("#rdf_export_button, #dropdown_rdf_export").click( function() { serialize_graph() });
+	
+	$("#fetch_triple_set_button").click( function() { fetch_triples() })
 	
 	$(document).on("mouseover", "#predicate", function() {
 		$(this).css("cursor","pointer");

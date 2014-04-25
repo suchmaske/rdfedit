@@ -8,6 +8,7 @@ from django.conf import settings
 
 from dajaxice.core import dajaxice_functions
 
+from WSP.settings import NAMESPACES_DICT
 from WSP.rdfedit.models import Document, RDF_XML
 from WSP.rdfedit.forms import DocumentForm, DeleteForm, EndpointForm
 from WSP.rdfedit.spo2rdfjson import spo2rdfjson
@@ -38,25 +39,7 @@ plugin.register("rdf-json-pretty", Serializer,
 
 
 # Create dictionary for namespaces for later bindings and display in the spo-view.
-namespaces_dict = {
-"dc":"http://purl.org/dc/elements/1.1/",
-"DOLCE-Lite":"http://www.loa-cnr.it/ontologies/DOLCE-Lite.owl#",
-"foaf":"http://xmlns.com/foaf/0.1/",
-"ore":"http://www.openarchives.org/ore/terms/",
-"dcmitype":"http://purl.org/dc/dcmitype/",
-"rdfs":"http://www.w3.org/2000/01/rdf-schema#",
-"xsd":"http://www.w3.org/2001/XMLSchema#",
-"owl":"http://www.w3.org/2002/07/owl#",
-"rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-"cidoc_crm_v5":"http://www.cidoc-crm.org/rdfs/cidoc_crm_v5.0.2_english_label.rdfs#",
-"core":"http://purl.org/vocab/frbr/core#",
-"dcterms":"http://purl.org/dc/terms/",
-"skos":"http://www.w3.org/2004/02/skos/core#",
-"vs":"http://www.w3.org/2003/06/sw-vocab-status/ns#",
-"gnd":"http://d-nb.info/standards/elementset/gnd#",
-"edm":"http://www.europeana.eu/schemas/edm/",
-"wsp":"http://wsp.normdata.rdf/"
-}
+namespaces_dict = NAMESPACES_DICT
 
 def index(request):
     # Handle file upload
@@ -109,7 +92,46 @@ def getrdf(doc_id):
     graph.load(doc.docfile)
     return graph
 
+def newgraph(request):
+    
+    print request.method
+    
+    # Create and bind namespaces
+    namespace_manager = NamespaceManager(Graph())
+    for ns in namespaces_dict:
+        namespace_manager.bind(ns, Namespace(namespaces_dict[ns]))
+    
+    # Create a new graph
+    graph = Graph()
+    graph.namespace_manager = namespace_manager
+    
+    triple_list = []
+    subject_list = []
+    predicate_list = []
+    
+    subject_set = {}
+    predicate_set = {}
+    
+    # Determine xml:base
+    subject_base_test_set = {triple[0] for triple in triple_list}
+    base_set = {subject[:subject.rfind("/")] for subject in subject_base_test_set}
+    # If all subjects share the same substring-base, this substring-base is likely to be the xml:base.
+    if len(base_set) == 1:
+        base = str(list(base_set)[0]) + "/"
+    else:
+        base = ""
+    
+    # Serialize graph
+    rdfjson = graph.serialize(None, format="rdf-json")
+    
+    response = render_to_response('rdfedit/triples.html', 
+                                  {'rdfjson': rdfjson, 'triple_list': triple_list, 'subject_set':subject_set, 'predicate_set':predicate_set,  'namespaces_dict':simplejson.dumps(namespaces_dict), 'base':base},
+                                  context_instance=RequestContext(request))
+    return response
+    
+
 def spo(request, doc_id):
+    
     # Create and bind namespaces
     namespace_manager = NamespaceManager(Graph())
     for ns in namespaces_dict:
@@ -124,8 +146,6 @@ def spo(request, doc_id):
     # If doc_id is not an integer, therefore a string, an SPARQL-endpoint url is being parsed
         graph = Graph()
         graph.parse(data=spo2rdfjson(doc_id), format="rdf-json") 
-    
-        
 
     # Generate list of triples
     triple_list = []

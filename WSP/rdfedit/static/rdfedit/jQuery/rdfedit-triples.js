@@ -413,14 +413,12 @@ function implement_fetched_triples(data) {
 
 /* Autocomplete of input fields */
 
-
-
 /* Datatables */
 
 var asInitVals = new Array();
 asInitVals_add = new Array();
 $(document).ready(function() {
-
+	
 	predicate_set_short = new Array();
 
 	$.each(predicate_set_full, function() {
@@ -538,10 +536,14 @@ $(document).ready(function() {
 		
 		autocomplete_subject = availableNamespaces.concat(subject_set);
 		autocomplete_predicate = availableNamespaces.concat(predicate_set_short);
-
+		
+		
 		$("#add_subject").autocomplete({source: autocomplete_subject});
 		$("#add_predicate").autocomplete({source: autocomplete_predicate});
 		$("#add_object").autocomplete({source: availableNamespaces});
+		
+		
+		$("#triple_set_type").autocomplete({source: triple_fetcher_classes});
 			
 	});
 	
@@ -585,6 +587,14 @@ $(document).ready(function() {
 	
 	$(document).on("mouseover", "#delete_triple", function() {
 		$(this).css("cursor","pointer");
+	});
+	
+	// Add the triple_fetcher_classes to the dropdown menu
+	var fetcher_type_selector = $("#triple_set_type_select")
+	$.each(triple_fetcher_classes, function(index, value) {
+		var list_element = $("<li></li>");
+		list_element.append($('<a href="#"></a>').val(value).html(value));
+		fetcher_type_selector.append(list_element);
 	});
 	
 

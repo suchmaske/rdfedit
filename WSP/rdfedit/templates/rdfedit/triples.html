@@ -59,7 +59,22 @@
     
     <tr id="fetch_triple_set">
     	<th><input id="triple_set_keywords" class="add_init" type="text" value="Enter keywords"></th>
-    	<th><input id="triple_set_type" class="add_init" type="text" value="Enter type"></th>	
+    	
+    	<th> <!-- Add a bootstrap dropdown menu to select the fetcher type -->
+    		<div class="btn-group">
+    			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+    			Select
+    			<span class="caret"></span>
+    			</button>
+    			<ul id="triple_set_type_select" class="dropdown-menu">
+    				<li><a href="#">Other</a></li>
+    			</ul>
+    		</div>
+    	<!-- 
+    	<th><select id="triple_set_type_select" class="dropdown-menu" >
+    		<option value="Other">Other </select>  
+    	<input id="triple_set_type" class="add_init" type="text" value="Enter type">
+    	--></th>
     	<th><button id="fetch_triple_set_button" class="btn btn-info"><i class="icon-white icon-repeat"></i> Fetch triples</button>
     </tr>
 </table>
@@ -79,6 +94,9 @@
 	base = '{{ base }}'
 	subject_set = JSON.parse('{{ subject_set|escapejs }}');
 	predicate_set_full = JSON.parse('{{ predicate_set|escapejs }}');
+	triple_fetcher_classes = JSON.parse('{{ triple_fetcher_classes | escapejs }}');
+	console.log(triple_fetcher_classes);
+	
 </script>
 
 {% load staticfiles %}

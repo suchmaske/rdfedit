@@ -180,5 +180,3 @@ def fetch_triples(sindice_query, type):
             triple_list.append([row.s, row.p, row.o])
     
         return triple_list
-    
-        #return new_graph

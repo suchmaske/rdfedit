@@ -8,7 +8,7 @@ from django.conf import settings
 
 from dajaxice.core import dajaxice_functions
 
-from WSP.settings import NAMESPACES_DICT
+from WSP.settings import NAMESPACES_DICT, SINDICE_CONFIG_QUERY
 from WSP.rdfedit.models import Document, RDF_XML
 from WSP.rdfedit.forms import DocumentForm, DeleteForm, EndpointForm
 from WSP.rdfedit.spo2rdfjson import spo2rdfjson
@@ -124,9 +124,13 @@ def newgraph(request):
     # Serialize graph
     rdfjson = graph.serialize(None, format="rdf-json")
     
+    # 
+    triple_fetcher_classes = get_triple_fetcher_classes()
+    
     response = render_to_response('rdfedit/triples.html', 
-                                  {'rdfjson': rdfjson, 'triple_list': triple_list, 'subject_set':subject_set, 'predicate_set':predicate_set,  'namespaces_dict':simplejson.dumps(namespaces_dict), 'base':base},
+                                  {'rdfjson': rdfjson, 'triple_list': triple_list, 'subject_set':subject_set, 'predicate_set':predicate_set,  'namespaces_dict':simplejson.dumps(namespaces_dict), 'base':base, 'triple_fetcher_classes': triple_fetcher_classes},
                                   context_instance=RequestContext(request))
+    
     return response
     
 
@@ -158,6 +162,7 @@ def spo(request, doc_id):
     
     subject_set = simplejson.dumps(list(set(subject_list)))
     predicate_set = simplejson.dumps(list(set(predicate_list)))
+    
 
     # Determine xml:base
     subject_base_test_set = {triple[0] for triple in triple_list}
@@ -170,12 +175,14 @@ def spo(request, doc_id):
 
     # Insert namespaces into graph
     graph.namespace_manager = namespace_manager
+    
+    triple_fetcher_classes = get_triple_fetcher_classes()
 
     # Serialize graph to RDFJson
     rdfjson = graph.serialize(None, format="rdf-json")
     return render_to_response(
         'rdfedit/triples.html',
-        {'rdfjson': rdfjson, 'triple_list': triple_list, 'subject_set':subject_set, 'predicate_set':predicate_set,  'namespaces_dict':simplejson.dumps(namespaces_dict), 'base':base},
+        {'rdfjson': rdfjson, 'triple_list': triple_list, 'subject_set':subject_set, 'predicate_set':predicate_set,  'namespaces_dict':simplejson.dumps(namespaces_dict), 'base':base, "triple_fetcher_classes": triple_fetcher_classes},
         context_instance=RequestContext(request)
     )    
     
@@ -198,4 +205,14 @@ def rdf(request, rdfxml_id):
 
     return response
 
+def get_triple_fetcher_classes():
+    
+    # Get available classes for the triple fetcher
+    sindice_query_config = simplejson.loads(open(SINDICE_CONFIG_QUERY, 'r').read())
+    triple_fetcher_classes = list()
+    
+    for triple_fetcher_class in sindice_query_config:
+        triple_fetcher_classes.append(triple_fetcher_class)
+    
+    return simplejson.dumps(list(set(triple_fetcher_classes)))
     

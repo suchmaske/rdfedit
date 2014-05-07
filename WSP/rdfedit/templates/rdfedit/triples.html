@@ -62,20 +62,30 @@
     	
     	<th> <!-- Add a bootstrap dropdown menu to select the fetcher type -->
     		<div class="btn-group">
-    			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-    			Select
+    			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="triple_set_type_select_label" >
+    			Other
     			<span class="caret"></span>
     			</button>
     			<ul id="triple_set_type_select" class="dropdown-menu">
     				<li><a href="#">Other</a></li>
     			</ul>
     		</div>
-    	<!-- 
-    	<th><select id="triple_set_type_select" class="dropdown-menu" >
-    		<option value="Other">Other </select>  
-    	<input id="triple_set_type" class="add_init" type="text" value="Enter type">
-    	--></th>
-    	<th><button id="fetch_triple_set_button" class="btn btn-info"><i class="icon-white icon-repeat"></i> Fetch triples</button>
+    	 
+    		<input id="triple_set_type_input" class="add_init" type="text" value="Enter type">
+    	</th>
+    	<th>
+  			<div class="btn-group">
+    			<button id="fetch_triple_set_button" class="btn btn-info"><i class="icon-white icon-repeat"></i> Fetch graphs</button>
+    			
+    			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="graph_selector_label">
+    				Choose Graph
+    				<span class="caret"></span>
+    			</button>
+    			<ul id="graph_selector" class="dropdown-menu">
+    			</ul>
+    			
+    		</div>
+    	</th>
     </tr>
 </table>
 </div>

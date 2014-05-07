@@ -60,12 +60,14 @@ def serialize_graph(request, rdfjson, base):
 def query_sindice(request, keywords, type):
     
     sindice_query = build_sindice_query(keywords, type)
-        
-    graph = fetch_triples(sindice_query, type)
+    
+    graph_uris = select_graph(sindice_query, type)
+    
+    # graph = fetch_triples(sindice_query, type)
     
     #graph_rdfjson = graph.serialize(format="rdf-json")
     
-    return simplejson.dumps({"fetched_triples": graph})
+    return simplejson.dumps({"graph_uris": graph_uris})
 
 def build_sindice_query(keywords, type):
     # Build the basic query
@@ -108,9 +110,10 @@ def build_sindice_query(keywords, type):
     
     return query
 
-def fetch_triples(sindice_query, type):
+@dajaxice_register(method = 'POST')
+def fetch_triples(request, graph_uri, type):
     
-    print sindice_query
+    print graph_uri
     
     # Get the mapping
     query_mapping = simplejson.loads(open(SINDICE_CONFIG_MAPPING, 'r').read())
@@ -126,32 +129,12 @@ def fetch_triples(sindice_query, type):
         
         # Get the mapping for the particular type
         type_mapping = query_mapping[type]
-    
-        # Load the request from the query
-        request = urllib2.urlopen(sindice_query, None)
-
-        # Parse the result into a json variable
-        result = simplejson.loads(request.read())
-        
-        result_counter = 0
-        rdf_hit = False
-        hit_link = ""
-        
-        while (rdf_hit == False and result_counter < len(result)):
-            hit = result["entries"][result_counter]
-            hit_format = hit["formats"]
-            if "RDF" in hit_format:
-                rdf_hit = True
-                hit_link = hit["link"]
-                
-            
-            result_counter += 1
         
         # Load the external graph
         external_graph = Graph()
         
         try:
-            external_graph.load(URIRef(hit_link))
+            external_graph.load(URIRef(graph_uri))
         except:
             print "URI unreachable"
         
@@ -179,4 +162,31 @@ def fetch_triples(sindice_query, type):
         for row in new_graph.query(spo_query):
             triple_list.append([row.s, row.p, row.o])
     
-        return triple_list
+        return simplejson.dumps({"triple_list": triple_list})
+    
+def select_graph(sindice_query, type):
+    
+    print sindice_query
+    
+    # Get the mapping
+    query_mapping = simplejson.loads(open(SINDICE_CONFIG_MAPPING, 'r').read())
+    
+    if type in query_mapping:
+        
+        # Get the mapping for the particular type
+        type_mapping = query_mapping[type]
+    
+        # Load the request from the query
+        request = urllib2.urlopen(sindice_query, None)
+
+        # Parse the result into a json variable
+        result = simplejson.loads(request.read())
+        
+        # Create a new list
+        graph_uris = list()
+        
+        # Add all URIs to the list
+        for entry in result["entries"]:
+            graph_uris.append(entry["link"])
+            
+        return graph_uris

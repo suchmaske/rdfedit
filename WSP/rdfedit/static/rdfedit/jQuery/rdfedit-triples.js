@@ -388,17 +388,59 @@ function serialize_graph(){
 }
 
 /* This function initiates the sindice request by calling Django via AJAX */
-function fetch_triples() {
+function fetch_graphs() {
 	var keywords = $("#triple_set_keywords").val();
-	var type = $("#triple_set_type").val();
+	
+	//
+	var type = "";
+	if ($("#triple_set_type_select_label").text() == "Other") {
+		type = $("#triple_set_type_input").val()
+	}
+	else {
+		type = $("#triple_set_type_select_label").text();
+	}
 
-	Dajaxice.WSP.rdfedit.query_sindice(implement_fetched_triples, {'keywords': keywords, 'type': type});
+	// Empty the graph selector list
+	$("#graph_selector").empty();
+	$("#graph_selector_label").html('Choose Graph<span class="caret"></span>');
+	
+	Dajaxice.WSP.rdfedit.query_sindice(implement_fetched_graph_uris, {'keywords': keywords, 'type': type});
+}
+
+function fetch_triples(graph_uri) {
+	
+	//
+	var type = "";
+	if ($("#triple_set_type_select_label").text() == "Other") {
+		type = $("#triple_set_type_input").val()
+	}
+	else {
+		type = $("#triple_set_type_select_label").text();
+	}
+	
+	Dajaxice.WSP.rdfedit.fetch_triples(implement_fetched_triples, {'graph_uri': graph_uri, 'type': type});
+	
+}
+
+function implement_fetched_graph_uris(data) {
+	
+	var graph_uris = data.graph_uris;
+	var graph_selector = $("#graph_selector");
+	
+	
+	
+	$.each(graph_uris, function(index, value) {
+		var value_short = full_to_short_uri(value);
+		var list_element = $("<li></li>");
+		list_element.append($('<a href="#"></a>').val(value_short).html(value_short));
+		graph_selector.append(list_element);
+	});
 }
 
 /* Return function of AJAX query_sindice */
 function implement_fetched_triples(data) {
 	//var fetched_triples = JSON.parse(data.fetched_triples)
-	var fetched_triples = data.fetched_triples;
+	var fetched_triples = data.triple_list;
 	
 	for (var i=0; i < fetched_triples.length; i++) {
 		
@@ -561,7 +603,7 @@ $(document).ready(function() {
 	
 	$("#rdf_export_button, #dropdown_rdf_export").click( function() { serialize_graph() });
 	
-	$("#fetch_triple_set_button").click( function() { fetch_triples() })
+	$("#fetch_triple_set_button").click( function() { fetch_graphs() })
 	
 	$(document).on("mouseover", "#predicate", function() {
 		$(this).css("cursor","pointer");
@@ -587,6 +629,33 @@ $(document).ready(function() {
 	
 	$(document).on("mouseover", "#delete_triple", function() {
 		$(this).css("cursor","pointer");
+	});
+	
+	// Change the value of the predefined triple_fetcher_classes dropdown and change the main value
+	$(document).on("click", "#triple_set_type_select li a", function() {
+		var selType = $(this).text();
+		$("#triple_set_type_select_label").html(selType + '<span class="caret"></span>');
+		
+		if (selType == "Other") {
+			$("#triple_set_type_input").show();
+		}
+		
+		else {
+			$("#triple_set_type_input").hide();
+		}
+	});
+	
+	// Change the value of the graph_selector
+	$(document).on("click", "#graph_selector li a", function() {
+		var selGraph = $(this).text();
+		var selType = "";
+		
+		$("#graph_selector_label").html(selGraph + '<span class="caret"></span>');
+		
+		var fullGraph = short_to_full_uri(selGraph);
+		
+		fetch_triples(fullGraph);
+		
 	});
 	
 	// Add the triple_fetcher_classes to the dropdown menu

@@ -16,7 +16,7 @@ thead, tfoot, #add_triple th {
     	background-color: #EEEEEE;
 }
 
-#add_button, #delete_triple, #undo_button {
+#add_button, #delete_triple, #undo_button, #apply_globally  {
 	float:right;
 }
 

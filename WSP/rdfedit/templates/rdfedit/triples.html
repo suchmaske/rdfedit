@@ -18,17 +18,23 @@
     {% for triple in triple_list %}
     <tr id="row">
 
-      <td id="subject" uri="{{ triple.0 }}">{{ triple.0 }}</td>
+      <!--  <td id="subject" uri="{{ triple.0 }}" contentEditable>{{ triple.0 }}</td> -->
+      
+      <td id="subject_container">
+      
+      	<span id="subject" uri="{{ triple.0 }}" contentEditable>{{ triple.0 }}</span>
+      	
+      </td>
 
       <td id="predicate" uri="{{ triple.1 }}" rel="tooltip" title="{{ triple.1 }}">{{ triple.1 }}</td>
 
       <td id="object_container">
 
-	<span id="object-icon-wrapper"><i id="object-icon" class="icon-white"></i></span>
+		<span id="object-icon-wrapper"><i id="object-icon" class="icon-white"></i></span>
 
         <span id="object" uri="{{ triple.2 }}" contentEditable>{{ triple.2 }}</span>
 
-	<span id="delete_triple"><i class="icon-black icon-remove-sign"></i></span>
+		<span id="delete_triple"><i class="icon-black icon-remove-sign"></i></span>
       </td>
     </tr>
     {% endfor %}

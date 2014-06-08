@@ -12,6 +12,7 @@ function undo() {
 	
 		// Take latest change and revert it
 		rdfjson = rdfjson_stack.pop();
+		
 		var action = action_stack.pop();
 	
 		
@@ -47,10 +48,43 @@ function undo() {
 
 		}
 
-		else if (action["action"] == "update") {
+		else if (action["action"] == "update_object") {
 
 			triple_table.fnUpdate(action["stock_object_container"], action["pos"][0], action["pos"][1], action["pos"][2]);
 
+		}
+		
+		else if (action["action"] = "update_subject_bulk") {
+			
+			// Since this was a bulk edit, revert also the single subject change
+			// Thus, pop the rdfjson_stack again
+			rdfjson = rdfjson_stack.pop();
+			
+			triple_table.fnUpdate(action["stock_subject_container"], action["pos"][0], action["pos"][1], action["pos"][2]);
+			
+			var table_size = triple_table.fnSettings().fnRecordsTotal();
+			
+			for (var i = 0; i < table_size; i++) {
+				
+				var current_subject = triple_table.fnGetData(i)[0];
+				var current_object = $('<span></span>').append(triple_table.fnGetData(i)[2]);
+				
+				var current_uri = $(current_subject).attr("uri");
+				
+				if (current_uri == action["orig_value"]) {
+					
+					triple_table.fnUpdate(action["stock_subject_container"], i, 0, 0);
+					
+				}
+				
+				current_uri = $(current_object).children("#object").attr("uri");
+				
+				if (current_uri == action["orig_value"]) {
+					triple_table.fnUpdate(action["stock_object_container"], i, 2, 2);
+				}
+				
+			}
+			
 		}
 
 	}
@@ -269,6 +303,19 @@ function create_object_container(value) {
 
 }
 
+function create_subject_container(value) {
+	
+	var new_subject_container = $('<span></span>')
+	var new_subject_content = $('<span id="subject" contentEditable></span>');
+	
+	
+	new_subject_content.attr("uri", value);
+	new_subject_content.text(value);
+	new_subject_container.append(new_subject_content);
+	
+	return new_subject_container;
+}
+
 function object_type(value) {
 // Check for object type (URI or Literal)
 	var type = "literal";
@@ -343,33 +390,46 @@ function hide_editbox(cell){
 	if ($(cell).hasClass('edit')){ 
 		$(cell).removeClass('edit');
 		$(cell).attr('uri', prefix_to_attr_uri(cell.innerHTML));
-		update_graph(cell);
+		
+		if ($(cell).is("#subject")) {
+			update_graph_subject(cell);
+		}
+		
+		else if ($(cell).is("#object")) {
+			update_graph_object(cell);
+		}
+		
 	}
+	
 }
 
 function show_editbox(cell){
-	$('#object').each( function(){
+	$('#subject, #object').each( function(){
 		hide_editbox(this);
 	});
+	
 	$(cell).addClass('edit');
 }
 
 
 /* AJAX: JSON exhange between JavaScript and Django for updating the graph */
 
-function update_graph(obj){
-/* Update existing triples */
+function update_graph_object(cell){
+/* Update existing triples when having changed an object*/
 
-	var changed_object = $(obj).attr('uri');
-    var subject = $(obj).parent().siblings("#subject").attr('uri');
-	var predicate = $(obj).parent().siblings("#predicate").attr('uri');
+	var changed_object = $(cell).attr('uri');
+    var subject = $(cell).parent().siblings("#subject_container").children("#subject").attr('uri');
+	var predicate = $(cell).parent().siblings("#predicate").attr('uri');
 
-	var stock_object_container = create_object_container(stock_object);
+	var stock_object_container = create_object_container(stock_value);
 	var object_container = create_object_container(changed_object);
-        var pos = triple_table.fnGetPosition(obj.parentNode);
-        triple_table.fnUpdate(object_container, pos[0], pos[1], pos[2]);
+	
+	console.log(object_container);
+    var pos = triple_table.fnGetPosition(cell.parentNode);
+    console.log(pos);
+    triple_table.fnUpdate(object_container, pos[0], pos[1], pos[2]);
 
-	var action = { "action":"update", "stock_object_container":stock_object_container, "pos":pos};
+	var action = { "action":"update_object", "stock_object_container":stock_object_container, "pos":pos};
 
 	action_stack.push(action);
 
@@ -377,10 +437,192 @@ function update_graph(obj){
     rdfjson_stack.push(temp_rdfjson);
 
 	for (var i = 0; i < rdfjson[subject][predicate].length; i++) {
-		if (rdfjson[subject][predicate][i]['value'] == stock_object){
+		if (rdfjson[subject][predicate][i]['value'] == stock_value){
 			rdfjson[subject][predicate][i]['value'] = changed_object;
 		}
 	}
+}
+
+function update_graph_subject(cell) {
+	
+	// Get the values from the table row
+	var changed_subject = $(cell).attr("uri");
+	var predicate = $(cell).parent().siblings("#predicate").attr("uri");
+	var object = $(cell).parent().siblings("#object_container").children("#object").attr("uri");
+	
+	// Create appropriate HTML containers
+	var stock_subject_container = create_subject_container(stock_value).html();
+	var subject_container = create_subject_container(changed_subject);
+	
+	
+	if (changed_subject != stock_value) {
+		var apply_icon = $("<span id='apply_globally'><i class='icon-black icon-mail-reply-all'></i></span>")
+		subject_container.append(apply_icon);
+	}
+	
+	subject_container = subject_container.html();
+	
+	// Get the position in the table
+	var pos = triple_table.fnGetPosition(cell.parentNode);
+	
+	// Update the value in the table
+	triple_table.fnUpdate(subject_container, pos[0], pos[1], pos[2]);
+	
+	// Add to action_stack
+	var action = { "action" : "update_subject", "stock_subject_container": stock_subject_container, "pos": pos, "orig_value": stock_value};
+	action_stack.push(action);
+	
+	// Add a copy of the old rdfjson state to the rdfson_stack
+	var temp_rdfjson = $.extend(true, {}, rdfjson);
+	rdfjson_stack.push(temp_rdfjson);
+	
+	// Insert the new data into the rdfjson object
+	// Create a new container for the object information 
+	var object_values = new Object();
+	object_values["type"] = object_type(object);
+	object_values["value"] = object;
+	
+	// Check whether the subject already exists in rdfjson
+	if (!rdfjson.hasOwnProperty(changed_subject)) {
+		
+		// Create the appropriate content
+		var object_array = new Array(object_values);
+		var predicate_object = new Object();
+		predicate_object[predicate] = object_array 
+		
+		rdfjson[changed_subject] = predicate_object;
+		
+	}
+	
+	// Else: the changed_subject already exists
+	else {
+		
+		// Check wether the predicate already exists for the changed subject
+		if (!rdfjson[changed_subject].hasOwnProperty(predicate)) {
+			
+			
+			var object_array = new Array(object_values);
+			
+			rdfjson[changed_subject][predicate] = object_array;
+			
+		}
+		
+		// Else: The predicate is already existent, so append the object array
+		else {
+			
+			rdfjson[changed_subject][predicate].push(object_values);
+			
+		}
+		
+	}
+	
+	// Now the original entry has to be deleted
+	// Get the length of the object_array for that predicate and subject
+	if (rdfjson[stock_value][predicate].length == 1) {
+		delete rdfjson[stock_value][predicate];
+		
+		// Now check whether this was the last predicate for that subject
+		if (rdfjson[stock_value].length == 0) {
+			delete rdfjson[stock_value];
+		}
+		
+	}
+	
+	// Elif, there are more than 1 objects for that predicate
+	else if (rdfjson[stock_value][predicate].length > 1) {
+		
+		var new_object_array = new Array();
+		
+		for (var i = 0; i < rdfjson[stock_value][predicate].length; i++) {
+			
+			var current_object = rdfjson[stock_value][predicate][i];
+			if (!current_object["value"] == object) {
+				new_object_array.push(current_object);
+			}
+			
+		}
+		
+		// Overwrite the old object with the new one
+		rdfjson[stock_value][predicate] = new_object_array;
+		
+	}
+}
+
+function update_graph_subject_bulk(apply_icon) {
+	
+	// Get the subject-cell from the selected row
+	var cell = $(apply_icon).parent().children("#subject");
+	
+	// Read SPO
+	var changed_subject = $(cell).attr("uri");
+	var predicate = $(cell).parent().siblings("#predicate").attr("uri");
+	var object = $(cell).parent().siblings("#object_container").children("#object").attr("uri");
+	
+	// Create containers
+	var stock_subject_container = create_subject_container(stock_value).html();
+	var subject_container = create_subject_container(changed_subject).html();
+	var stock_object_container = create_object_container(stock_value);
+	var object_container = create_object_container(changed_subject);
+	console.log(subject_container);
+	
+	// Get the position in the table
+	var pos = triple_table.fnGetPosition(apply_icon.parentNode);
+	
+	// Update the table
+	triple_table.fnUpdate(subject_container, pos[0], pos[1], pos[2]);
+	
+	// Push to redo action stack
+	var action = { "action" : "update_subject_bulk", "stock_subject_container": stock_subject_container, "stock_object_container" : stock_object_container, "pos": pos, "orig_value": changed_subject};
+	action_stack.push(action);
+	
+	// Push to redo rdfjson stack
+	var temp_rdfjson = $.extend(true, {}, rdfjson);
+	rdfjson_stack.push(temp_rdfjson);
+	
+	// Compute the table size
+	var table_size = triple_table.fnSettings().fnRecordsTotal();
+	console.log(table_size);
+	
+	// Iterate over the table size
+	for (var i = 0; i < table_size; i++) {
+		
+		// Check for subject
+		var current_subject = triple_table.fnGetData(i)[0];
+		var current_uri = $(current_subject).attr("uri");
+		if (current_uri == stock_value) {
+			triple_table.fnUpdate(subject_container, i, 0, 0);
+		}
+		
+		// Check for object
+		var current_object = $('<span></span>').append(triple_table.fnGetData(i)[2]);
+		current_uri = $(current_object).children("#object").attr("uri");
+		
+		if (current_uri == stock_value) {
+			triple_table.fnUpdate(object_container, i, 2, 2);
+		}
+		
+		
+	}
+	
+	// Replace the old subject with the new one
+	var rdfjson_subject = rdfjson[stock_value];
+	
+	rdfjson[changed_subject] = rdfjson_subject;
+	delete rdfjson[stock_value];
+	
+	// Replace the objects
+	for (subject in rdfjson) {
+		for (predicate in rdfjson[subject]) {
+			for (var i = 0; i < rdfjson[subject][predicate].length; i++) {
+				if (rdfjson[subject][predicate][i]['value'] == stock_value){
+					rdfjson[subject][predicate][i]['value'] = changed_subject;
+				}
+			}
+		}
+	}
+	
+	
+	
 }
 
 function serialize_graph(){
@@ -614,13 +856,20 @@ $(document).ready(function() {
 	})
 	
 	
-	$(document).on("click", "#object", function() {
+	$(document).on("click",  "#subject, #object", function() {
 		show_editbox(this);
-		stock_object = $(this).attr("uri");
+		stock_value = $(this).attr("uri");
+		// Insert a apply to all button if you alter a subject
 	});
 	
-	$(document).on("blur", "#object", function() {
+	$(document).on("blur", "#subject, #object", function() {
 		hide_editbox(this);
+	});
+	
+	$(document).on("click", "#apply_globally", function()  {
+		stock_value = action_stack[action_stack.length-1]["orig_value"];
+		console.log(stock_value); 
+		update_graph_subject_bulk(this);
 	});
 	
 	$(document).on("click", "#delete_triple", function() {

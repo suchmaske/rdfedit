@@ -5,6 +5,28 @@ function js_graph_update(data){
 	window.location.href= rdf_url;
 }
 
+spinner_opts = {
+		  lines: 13, // The number of lines to draw
+		  length: 5, // The length of each line
+		  width: 3, // The line thickness
+		  radius: 5, // The radius of the inner circle
+		  corners: 1, // Corner roundness (0..1)
+		  rotate: 0, // The rotation offset
+		  direction: 1, // 1: clockwise, -1: counterclockwise
+		  color: '#000', // #rgb or #rrggbb or array of colors
+		  speed: 1, // Rounds per second
+		  trail: 60, // Afterglow percentage
+		  shadow: false, // Whether to render a shadow
+		  hwaccel: false, // Whether to use hardware acceleration
+		  className: 'spinner', // The CSS class to assign to the spinner
+		  zIndex: 2e9, // The z-index (defaults to 2000000000)
+		  top: '50%', // Top position relative to parent
+		  left: '50%' // Left position relative to parent
+		};
+
+
+
+
 function undo() {
 
 	// If the action stack and rdfjson stack are not empty
@@ -646,6 +668,9 @@ function fetch_graphs() {
 	$("#graph_selector").empty();
 	$("#graph_selector_label").html('Choose Graph<span class="caret"></span>');
 	
+	var spinner_target = document.getElementById("fetch_triple_set_button");
+	spinner.spin(spinner_target);
+	
 	Dajaxice.WSP.rdfedit.query_sindice(implement_fetched_graph_uris, {'keywords': keywords, 'type': type});
 }
 
@@ -660,6 +685,9 @@ function fetch_triples(graph_uri) {
 		type = $("#triple_set_type_select_label").text();
 	}
 	
+	var spinner_target = document.getElementById("graph_selector_label");
+	spinner.spin(spinner_target);
+	
 	Dajaxice.WSP.rdfedit.fetch_triples(implement_fetched_triples, {'graph_uri': graph_uri, 'type': type});
 	
 }
@@ -669,7 +697,7 @@ function implement_fetched_graph_uris(data) {
 	var graph_uris = data.graph_uris;
 	var graph_selector = $("#graph_selector");
 	
-	
+	spinner.stop();
 	
 	$.each(graph_uris, function(index, value) {
 		var value_short = full_to_short_uri(value);
@@ -677,6 +705,9 @@ function implement_fetched_graph_uris(data) {
 		list_element.append($('<a href="#"></a>').val(value_short).html(value_short));
 		graph_selector.append(list_element);
 	});
+	
+	$("#graph_selector_label").text("Choose Graph (" + graph_uris.length + ") ");
+	$("#graph_selector_label").append('<span class="caret"></span>');
 }
 
 /* Return function of AJAX query_sindice */
@@ -693,6 +724,8 @@ function implement_fetched_triples(data) {
 		
 		add_triple(new_subject, new_predicate, new_object);
 	}
+	
+	spinner.stop();
 }
 
 /* Autocomplete of input fields */
@@ -702,6 +735,8 @@ function implement_fetched_triples(data) {
 var asInitVals = new Array();
 asInitVals_add = new Array();
 $(document).ready(function() {
+	
+	spinner = new Spinner(spinner_opts);
 	
 	predicate_set_short = new Array();
 

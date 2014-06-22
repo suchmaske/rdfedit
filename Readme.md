@@ -16,6 +16,10 @@ Prequisites:
 	* rdflib-rdfjson 
 	* widget-tweaks https://pypi.python.org/pypi/django-widget-tweaks
 	* simplejson https://pypi.python.org/pypi/simplejson/
+* jQuery
+* Bootstrap CSS
+* Spin.js https://fgnass.github.io/spin.js/
+
 	
 
 Todo:
@@ -25,4 +29,4 @@ Todo:
 
 My example Instance:
 
-Go to: http://ec2-54-213-21-249.us-west-2.compute.amazonaws.com:8080/rdfedit/index/ and click the example button.
+// Go to: http://ec2-54-213-21-249.us-west-2.compute.amazonaws.com:8080/rdfedit/index/ and click the example button. (Link does not longer work, since free tier has expired. Moving to another server)

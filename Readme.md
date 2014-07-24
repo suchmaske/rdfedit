@@ -12,21 +12,13 @@ Prequisites:
 	* Dajaxice http://www.dajaxproject.com/
 	* rdflib https://github.com/RDFLib/rdflib
 	* rdflib-jsonld https://github.com/RDFLib/rdflib-jsonld
-	* rdflib-sparql
-	* rdflib-rdfjson 
+	* rdflib-sparql (Install manually)
+	* rdflib-rdfjson (Install manually)
 	* widget-tweaks https://pypi.python.org/pypi/django-widget-tweaks
 	* simplejson https://pypi.python.org/pypi/simplejson/
+	* You can download most packages using pip (sudo pip install rdflib)
+
 * jQuery
 * Bootstrap CSS
 * Spin.js https://fgnass.github.io/spin.js/
 
-	
-
-Todo:
-* Support more upload formats
-* Provide tests and setup files
-* Spring cleaning
-
-My example Instance:
-
-// Go to: http://ec2-54-213-21-249.us-west-2.compute.amazonaws.com:8080/rdfedit/index/ and click the example button. (Link does not longer work, since free tier has expired. Moving to another server)

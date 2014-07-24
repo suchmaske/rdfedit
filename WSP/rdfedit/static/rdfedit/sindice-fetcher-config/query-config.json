@@ -5,6 +5,12 @@
 	"fq=domain" : "dbpedia",
 	"fq=class" : "foaf:person"
 
-	}
+	},
+
+"dcterms:spatial" : {
+
+	"fq=domain" : "geonames",
+	"fq=format" : "RDF"
+}
 
 }

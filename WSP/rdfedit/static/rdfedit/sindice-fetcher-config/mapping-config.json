@@ -4,6 +4,9 @@
  	"dbpprop:author" : "dc:creator",
  	"foaf:name" : "foaf:name"
  	
- 	}
+ 	},
 
+ "dcterms:spatial" : {
+ 	"rdfs:isDefinedBy" : "dcterms:spatial"
+ }
 }

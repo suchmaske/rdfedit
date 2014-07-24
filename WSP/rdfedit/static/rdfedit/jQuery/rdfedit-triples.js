@@ -123,14 +123,16 @@ function delete_triple(row, del_obj){
 	// Obtain row number
 	var del_row = triple_table.fnGetPosition(row);
 
-	// Get subject content
-	var del_subject = triple_table.fnGetData(del_row[0], 0, 0);
-	del_subject = short_to_full_uri(del_subject);
-	console.log("DEL_S: " + Object.keys(rdfjson[del_subject]).length);
+	// Get subject content -- Make sure to actually get the contents of the subject span
+	var del_subject = $(triple_table.fnGetData(del_row[0], 0, 0));
+	del_subject = short_to_full_uri(del_subject.text());
+	
+	//console.log("DEL_S: " + Object.keys(rdfjson[del_subject]).length);
 	
 	// Get predicate content
-	var del_predicate = triple_table.fnGetData(del_row[0], 1, 1);
-	del_predicate = short_to_full_uri(del_predicate);
+	var del_predicate = $(triple_table.fnGetData(del_row[0], 1, 1));
+	del_predicate = short_to_full_uri(del_predicate.text());
+	console.log(del_predicate);
 	
 	// Get object content
     var del_object_container = triple_table.fnGetData(del_row[0], 2, 2);
@@ -205,19 +207,32 @@ function add_triple(new_subject, new_predicate, new_object){
 			$("#add_predicate").autocomplete({source: autocomplete_predicate});
 		}
 		
+		
 		new_subject = short_to_full_uri(new_subject);
+		new_subject_container = create_subject_container(new_subject);
+		
 		new_predicate = short_to_full_uri(new_predicate);
-
+		new_predicate_container = create_predicate_container(new_predicate);
+		
+		
+		var new_object_container;
+		
 		/* Process new_object */
 		var new_object_type = "literal";
 		if (valid_uri(new_object) == true) {
 			new_object_type = "uri";
 			new_object = short_to_full_uri(new_object);
 		}	
+		
+		/* If the new object is a literal, try to fetch a relevant URI */
+		else {
+			
+			Dajaxice.WSP.rdfedit.adaptive_field_query(implement_fetched_adaptive_field_URIs, {"predicate": new_predicate, "lit_object": new_object});
+						
+		}
 
-		/* Create new node that will be inserted into the object-column of the new triple-row */
-
-		new_object_container = create_object_container(new_object);
+		/* Create new node that will be inserted into the object-column of the new triple-row */		
+		new_object_container = create_object_container(new_object)
 
 		if (rdfjson.hasOwnProperty(new_subject)) {
 		/* If the subject already exists */
@@ -242,8 +257,8 @@ function add_triple(new_subject, new_predicate, new_object){
 		}
 		/* Add data to table */
 		triple_table.fnAddData([
-			full_to_short_uri(new_subject),
-			full_to_short_uri(new_predicate),
+			full_to_short_uri(new_subject_container.html()),
+			full_to_short_uri(new_predicate_container.html()),
 			full_to_short_uri(new_object_container),
 		]);
 
@@ -254,9 +269,7 @@ function add_triple(new_subject, new_predicate, new_object){
 		
 		var new_node = triple_table.fnGetNodes()[triple_table.fnSettings().fnRecordsTotal()-1];
 
-		triple_table.fnDisplayRow(new_node);
-		
-		console.log(rdfjson);
+		//triple_table.fnDisplayRow(new_node);
 
 	}	
 
@@ -325,17 +338,84 @@ function create_object_container(value) {
 
 }
 
+function create_literal_object_container(value, graph_uris) {
+	
+	var new_object_container = $('<span></span>');
+	// Create an empty jQuery object to work with
+
+        if (object_type(value) == "literal") {
+			var new_object_icon = $('<span id="object_icon-wrapper"><i id="object-icon" class="icon-white icon-ellipsis-horizontal"></i></span>');
+        }
+        else {
+                var new_object_icon = $('<span id="object-icon-wrapper"><i id="object-icon" class="icon-white icon-globe"></i></span>');
+        }
+
+	var new_object_content = $('<span id="object" contentEditable></span>')
+            new_object_content.attr("uri", value);
+            new_object_content.text(full_to_short_uri(value));
+
+            var new_object_delete_button = $('<span id="delete_triple"></span>');
+            var new_object_delete_button_icon = $('<i class="icon-black icon-remove-sign"></i>');
+            new_object_delete_button.append(new_object_delete_button_icon);
+
+            var fetch_span = $("<span></span>")
+            var new_object_fetch_button = $('<select id="adaptive_selector"></select>');
+            
+            // Make sure a select statement is given
+			var list_element = $("<option></option>");
+			list_element.append("Select URI");
+			new_object_fetch_button.append(list_element);
+            
+            $.each(graph_uris, function(index, value) {
+		
+            	var value_short = full_to_short_uri(value);
+				var list_element = $("<option></option>");
+				list_element.append(value_short);
+				new_object_fetch_button.append(list_element);
+				
+            });
+                        
+            new_object_container.append(new_object_icon);
+            new_object_container.append(new_object_content);
+            new_object_container.append(new_object_delete_button);
+            
+            console.log(graph_uris.length);
+            
+            if (graph_uris.length > 0) {
+            	
+            	new_object_container.append(new_object_fetch_button);
+
+            }
+	return new_object_container.html()
+	
+}
+
 function create_subject_container(value) {
 	
-	var new_subject_container = $('<span></span>')
+	var new_subject_container = $('<span></span>');
 	var new_subject_content = $('<span id="subject" contentEditable></span>');
 	
 	
 	new_subject_content.attr("uri", value);
-	new_subject_content.text(value);
+	new_subject_content.text(full_to_short_uri(value));
 	new_subject_container.append(new_subject_content);
 	
 	return new_subject_container;
+}
+
+function create_predicate_container(value) {
+	
+	console.log(value)	
+	var new_predicate_container = $('<span></span>');
+	var new_predicate_content = $('<span id="predicate"></span>');
+	
+	new_predicate_content.attr("uri", value);
+	new_predicate_content.attr("rel", "tooltip");
+	new_predicate_content.attr("title", value);
+	new_predicate_content.text(full_to_short_uri(value));
+	new_predicate_container.append(new_predicate_content);
+	
+	return new_predicate_container;
 }
 
 function object_type(value) {
@@ -440,14 +520,18 @@ function update_graph_object(cell){
 /* Update existing triples when having changed an object*/
 
 	var changed_object = $(cell).attr('uri');
-    var subject = $(cell).parent().siblings("#subject_container").children("#subject").attr('uri');
-	var predicate = $(cell).parent().siblings("#predicate").attr('uri');
-
+	
+    var subject = $(cell).parent().siblings(".subject_container").children("#subject").attr('uri');
+	var predicate = $(cell).parent().siblings(".predicate_container").children("#predicate").attr('uri');
+	
+	console.log(changed_object);	
+	
 	var stock_object_container = create_object_container(stock_value);
 	var object_container = create_object_container(changed_object);
-	
-	console.log(object_container);
+	 
     var pos = triple_table.fnGetPosition(cell.parentNode);
+    
+    
     console.log(pos);
     triple_table.fnUpdate(object_container, pos[0], pos[1], pos[2]);
 
@@ -461,6 +545,7 @@ function update_graph_object(cell){
 	for (var i = 0; i < rdfjson[subject][predicate].length; i++) {
 		if (rdfjson[subject][predicate][i]['value'] == stock_value){
 			rdfjson[subject][predicate][i]['value'] = changed_object;
+			rdfjson[subject][predicate][i]['type'] = object_type(changed_object);
 		}
 	}
 }
@@ -470,7 +555,7 @@ function update_graph_subject(cell) {
 	// Get the values from the table row
 	var changed_subject = $(cell).attr("uri");
 	var predicate = $(cell).parent().siblings("#predicate").attr("uri");
-	var object = $(cell).parent().siblings("#object_container").children("#object").attr("uri");
+	var object = $(cell).parent().siblings(".object_container").children("#object").attr("uri");
 	
 	// Create appropriate HTML containers
 	var stock_subject_container = create_subject_container(stock_value).html();
@@ -578,7 +663,7 @@ function update_graph_subject_bulk(apply_icon) {
 	// Read SPO
 	var changed_subject = $(cell).attr("uri");
 	var predicate = $(cell).parent().siblings("#predicate").attr("uri");
-	var object = $(cell).parent().siblings("#object_container").children("#object").attr("uri");
+	var object = $(cell).parent().siblings(".object_container").children("#object").attr("uri");
 	
 	// Create containers
 	var stock_subject_container = create_subject_container(stock_value).html();
@@ -692,6 +777,7 @@ function fetch_triples(graph_uri) {
 	
 }
 
+
 function implement_fetched_graph_uris(data) {
 	
 	var graph_uris = data.graph_uris;
@@ -728,6 +814,25 @@ function implement_fetched_triples(data) {
 	spinner.stop();
 }
 
+function implement_fetched_adaptive_field_URIs(data) {	
+	
+	var graph_uris = data["select_graphs"];
+		
+	var lit_object = data["lit_object"]
+	
+	
+	var new_node = triple_table.fnGetNodes()[triple_table.fnSettings().fnRecordsTotal()-1];
+	var position = triple_table.fnGetPosition(new_node);
+	
+	var object_container = create_literal_object_container(lit_object, graph_uris);
+	triple_table.fnUpdate(object_container, position, 2, 2);	
+	
+	triple_table.fnDisplayRow(new_node);
+	
+
+	
+}
+
 /* Autocomplete of input fields */
 
 /* Datatables */
@@ -736,8 +841,10 @@ var asInitVals = new Array();
 asInitVals_add = new Array();
 $(document).ready(function() {
 	
-	spinner = new Spinner(spinner_opts);
+
 	
+	spinner = new Spinner(spinner_opts);
+		
 	predicate_set_short = new Array();
 
 	$.each(predicate_set_full, function() {
@@ -772,6 +879,11 @@ $(document).ready(function() {
                 "oLanguage": {
                         "sLengthMenu": "_MENU_ records per page"
                 },
+                "aoColumns": [
+                              {"sClass": "subject_container"},
+                              {"sClass": "predicate_container" },
+                              {"sClass": "object_container" }
+                          ],
 		"bSortClasses": false,
 		"bRetrieve": true
         } );
@@ -908,6 +1020,7 @@ $(document).ready(function() {
 	});
 	
 	$(document).on("click", "#delete_triple", function() {
+		// console.log($(this).siblings('#object').text());
 		delete_triple(this.parentNode, $(this).siblings('#object').text());
 	});
 	
@@ -948,6 +1061,21 @@ $(document).ready(function() {
 		var list_element = $("<li></li>");
 		list_element.append($('<a href="#"></a>').val(value).html(value));
 		fetcher_type_selector.append(list_element);
+	});
+	
+	$(document).on("change", "#adaptive_selector", function() {
+			var selection = $("#adaptive_selector :selected").text();
+			var selection_full = short_to_full_uri(selection);
+			
+			var stock_object_cell = $(this).parent().children("#object"); 
+			
+			stock_value = stock_object_cell.text();
+			
+			// Change URI
+			stock_object_cell.attr("uri", selection_full);
+			
+			update_graph_object(stock_object_cell.get(0));
+			
 	});
 	
 

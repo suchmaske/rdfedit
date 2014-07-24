@@ -20,15 +20,17 @@
 
       <!--  <td id="subject" uri="{{ triple.0 }}" contentEditable>{{ triple.0 }}</td> -->
       
-      <td id="subject_container">
+      <td>
       
       	<span id="subject" uri="{{ triple.0 }}" contentEditable>{{ triple.0 }}</span>
       	
       </td>
+	
+	  <td>
+      	<span id="predicate" uri="{{ triple.1 }}" rel="tooltip" title="{{ triple.1 }}">{{ triple.1 }}</span>
+	  </td>
 
-      <td id="predicate" uri="{{ triple.1 }}" rel="tooltip" title="{{ triple.1 }}">{{ triple.1 }}</td>
-
-      <td id="object_container">
+      <td>
 
 		<span id="object-icon-wrapper"><i id="object-icon" class="icon-white"></i></span>
 

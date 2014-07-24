@@ -190,3 +190,21 @@ def select_graph(sindice_query, type):
             graph_uris.append(entry["link"])
             
         return graph_uris
+    
+@dajaxice_register(method = 'POST')
+def adaptive_field_query(request, predicate, lit_object):
+    
+    predicate = predicate.encode("ascii", 'ignore')
+    
+    for ns in namespaces_dict:
+        
+        if predicate.startswith(namespaces_dict[ns]):
+            
+            predicate = predicate.replace(namespaces_dict[ns], ns + ":")
+    
+    # Build a sindice query for that type (predicate) and object
+    sindice_query = build_sindice_query(lit_object, predicate)
+    
+    select_graphs = select_graph(sindice_query, predicate)
+    
+    return simplejson.dumps({"select_graphs" : select_graphs, "lit_object": lit_object})

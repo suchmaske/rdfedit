@@ -15,7 +15,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': os.path.join(PROJECT_ROOT, 'database/database.sqlite3'),                      # Or path to database file if using sqlite3.
+        'NAME': os.path.join(PROJECT_ROOT, "database", "database.sqlite3"), # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
         'USER': '',
         'PASSWORD': '',
@@ -57,8 +57,9 @@ MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
 
 # Get the sindice config directory
 SINDICE_API_URL = "http://api.sindice.com/v3/search?"
-SINDICE_CONFIG_QUERY = os.path.join(PROJECT_ROOT, 'rdfedit/static/rdfedit/sindice-fetcher-config/query-config.json')
-SINDICE_CONFIG_MAPPING = os.path.join(PROJECT_ROOT, 'rdfedit/static/rdfedit/sindice-fetcher-config/mapping-config.json')
+SINDICE_CONFIG_QUERY = os.path.join(PROJECT_ROOT, "rdfedit", "static", "rdfedit", "sindice-fetcher-config", "query-config.json")
+SINDICE_CONFIG_MAPPING = os.path.join(PROJECT_ROOT, "rdfedit", "static", "rdfedit", "sindice-fetcher-config", "mapping-config.json")
+
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.

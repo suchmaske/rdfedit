@@ -55,3 +55,7 @@ thead, tfoot, #add_triple th {
 .deleted {
 	background-color: #eed3d7;
 }
+
+#apply_globally {
+	cursor: pointer;
+}

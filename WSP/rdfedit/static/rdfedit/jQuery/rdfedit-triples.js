@@ -54,10 +54,10 @@ function undo() {
 
             var new_node = triple_table.fnGetNodes()[triple_table.fnSettings().fnRecordsTotal()-1];
 			
-			$(new_node).find("td:first-child").attr("uri", short_to_full_uri(action["subject"]));
+			//$(new_node).find("td:first-child").attr("uri", short_to_full_uri(action["subject"]));
 			$(new_node).find("td:first-child").attr("id", "subject");
 			
-			$(new_node).find("td:nth-child(2)").attr("uri", short_to_full_uri(action["predicate"]));
+			// $(new_node).find("td:nth-child(2)").attr("uri", short_to_full_uri(action["predicate"]));
 			$(new_node).find("td:nth-child(2)").attr("rel","tooltip");
 			$(new_node).find("td:nth-child(2)").attr("title", short_to_full_uri(action["predicate"]));
 			$(new_node).find("td:nth-child(2)").attr("id","predicate");
@@ -323,7 +323,7 @@ function create_object_container(value) {
             }
 
 		var new_object_content = $('<span id="object" contentEditable></span>')
-                new_object_content.attr("uri", value);
+                // new_object_content.attr("uri", value);
                 new_object_content.text(full_to_short_uri(value));
 
                 var new_object_delete_button = $('<span id="delete_triple"></span>');
@@ -351,7 +351,7 @@ function create_literal_object_container(value, graph_uris) {
         }
 
 	var new_object_content = $('<span id="object" contentEditable></span>')
-            new_object_content.attr("uri", value);
+           // new_object_content.attr("uri", value);
             new_object_content.text(full_to_short_uri(value));
 
             var new_object_delete_button = $('<span id="delete_triple"></span>');
@@ -396,7 +396,7 @@ function create_subject_container(value) {
 	var new_subject_content = $('<span id="subject" contentEditable></span>');
 	
 	
-	new_subject_content.attr("uri", value);
+	// new_subject_content.attr("uri", value);
 	new_subject_content.text(full_to_short_uri(value));
 	new_subject_container.append(new_subject_content);
 	
@@ -409,7 +409,7 @@ function create_predicate_container(value) {
 	var new_predicate_container = $('<span></span>');
 	var new_predicate_content = $('<span id="predicate"></span>');
 	
-	new_predicate_content.attr("uri", value);
+	// new_predicate_content.attr("uri", value);
 	new_predicate_content.attr("rel", "tooltip");
 	new_predicate_content.attr("title", value);
 	new_predicate_content.text(full_to_short_uri(value));
@@ -553,9 +553,15 @@ function update_graph_object(cell){
 function update_graph_subject(cell) {
 	
 	// Get the values from the table row
-	var changed_subject = $(cell).attr("uri");
-	var predicate = $(cell).parent().siblings("#predicate").attr("uri");
-	var object = $(cell).parent().siblings(".object_container").children("#object").attr("uri");
+	var changed_subject = short_to_full_uri($(cell).text());
+	
+	var predicate = $(cell).parent().siblings(".predicate_container").children("#predicate").text();
+	predicate = short_to_full_uri(predicate);
+	console.log(predicate);
+
+
+	var object = $(cell).parent().siblings(".object_container").children("#object").text();
+	object = short_to_full_uri(object);
 	
 	// Create appropriate HTML containers
 	var stock_subject_container = create_subject_container(stock_value).html();
@@ -625,6 +631,7 @@ function update_graph_subject(cell) {
 	
 	// Now the original entry has to be deleted
 	// Get the length of the object_array for that predicate and subject
+
 	if (rdfjson[stock_value][predicate].length == 1) {
 		delete rdfjson[stock_value][predicate];
 		
@@ -661,9 +668,9 @@ function update_graph_subject_bulk(apply_icon) {
 	var cell = $(apply_icon).parent().children("#subject");
 	
 	// Read SPO
-	var changed_subject = $(cell).attr("uri");
-	var predicate = $(cell).parent().siblings("#predicate").attr("uri");
-	var object = $(cell).parent().siblings(".object_container").children("#object").attr("uri");
+	var changed_subject = short_to_full_uri($(cell).text());
+	var predicate = short_to_full_uri($(cell).parent().siblings("#predicate").text());
+	var object = short_to_full_uri($(cell).parent().siblings(".object_container").children("#object").text());
 	
 	// Create containers
 	var stock_subject_container = create_subject_container(stock_value).html();
@@ -695,14 +702,14 @@ function update_graph_subject_bulk(apply_icon) {
 		
 		// Check for subject
 		var current_subject = triple_table.fnGetData(i)[0];
-		var current_uri = $(current_subject).attr("uri");
+		var current_uri = short_to_full_uri($(current_subject).text());
 		if (current_uri == stock_value) {
 			triple_table.fnUpdate(subject_container, i, 0, 0);
 		}
 		
 		// Check for object
 		var current_object = $('<span></span>').append(triple_table.fnGetData(i)[2]);
-		current_uri = $(current_object).children("#object").attr("uri");
+		current_uri = short_to_full_uri($(current_object).children("#object").text());
 		
 		if (current_uri == stock_value) {
 			triple_table.fnUpdate(object_container, i, 2, 2);
@@ -999,13 +1006,15 @@ $(document).ready(function() {
 	})
 	
 	$(document).on("click", "#predicate", function() {
-		window.open($(this).attr("uri"), "_newtab");
+		window.open($(this).attr("title"), "_newtab");
 	})
 	
 	
 	$(document).on("click",  "#subject, #object", function() {
 		show_editbox(this);
-		stock_value = $(this).attr("uri");
+		// stock_value = $(this).attr("uri");
+		stock_value = short_to_full_uri($(this).text());
+		console.log(stock_value);
 		// Insert a apply to all button if you alter a subject
 	});
 	
@@ -1072,7 +1081,7 @@ $(document).ready(function() {
 			stock_value = stock_object_cell.text();
 			
 			// Change URI
-			stock_object_cell.attr("uri", selection_full);
+			// stock_object_cell.attr("uri", selection_full);
 			
 			update_graph_object(stock_object_cell.get(0));
 			

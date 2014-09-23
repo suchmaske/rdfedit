@@ -197,7 +197,8 @@ NAMESPACES_DICT = {
 "edm":"http://www.europeana.eu/schemas/edm/",
 "wsp":"http://wsp.normdata.rdf/",
 "dbpedia": "http://dbpedia.org/resource/",
-"dbpprop": "http://dbpedia.org/property/"
+"dbpprop": "http://dbpedia.org/property/",
+"gn": "http://www.geonames.org/ontology#"
 }
 
 

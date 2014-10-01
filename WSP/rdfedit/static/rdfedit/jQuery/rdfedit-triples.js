@@ -31,12 +31,12 @@ function undo() {
 
 	// If the action stack and rdfjson stack are not empty
 	if ((rdfjson_stack.length > 0) && (action_stack.length > 0)) {
-	
+
 		// Take latest change and revert it
 		rdfjson = rdfjson_stack.pop();
 		
 		var action = action_stack.pop();
-	
+		console.log(action["action"]);
 		
 		if (action["action"] == "add") {
 			var del_node = triple_table.fnGetNodes()[action["row"]]
@@ -75,8 +75,14 @@ function undo() {
 			triple_table.fnUpdate(action["stock_object_container"], action["pos"][0], action["pos"][1], action["pos"][2]);
 
 		}
+
+		else if (action["action"] == "update_subject") {
+
+			triple_table.fnUpdate(action["stock_subject_container"], action["pos"][0], action["pos"][1], action["pos"][2]);
+
+		}
 		
-		else if (action["action"] = "update_subject_bulk") {
+		else if (action["action"] == "update_subject_bulk") {
 			
 			// Since this was a bulk edit, revert also the single subject change
 			// Thus, pop the rdfjson_stack again
@@ -91,7 +97,7 @@ function undo() {
 				var current_subject = triple_table.fnGetData(i)[0];
 				var current_object = $('<span></span>').append(triple_table.fnGetData(i)[2]);
 				
-				var current_uri = $(current_subject).attr("uri");
+				var current_uri = $(current_subject).text();
 				
 				if (current_uri == action["orig_value"]) {
 					

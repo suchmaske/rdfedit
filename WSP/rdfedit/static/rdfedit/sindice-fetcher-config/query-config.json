@@ -1,16 +1,17 @@
 {
 
-"foaf:person" : {
+"Person" : {
 
 	"fq=domain" : "dbpedia",
 	"fq=class" : "foaf:person"
 
 	},
 
-"dcterms:spatial" : {
+"Location" : {
 
 	"fq=domain" : "geonames",
-	"fq=format" : "RDF"
+	"fq=format" : "RDF",
+	"fq=class" : "dcterms:spatial"
 }
 
 }

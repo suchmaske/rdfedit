@@ -10,8 +10,7 @@
 "Location" : {
 
 	"fq=domain" : "geonames",
-	"fq=format" : "RDF",
-	"fq=class" : "dcterms:spatial"
+	"fq=format" : "RDF"
 }
 
 }

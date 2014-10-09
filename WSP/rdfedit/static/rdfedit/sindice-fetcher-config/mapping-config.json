@@ -1,12 +1,12 @@
 {
- "foaf:person" : {
+ "Person" : {
  
  	"dbpprop:author" : "dc:creator",
  	"foaf:name" : "foaf:name"
  	
  	},
 
- "dcterms:spatial" : {
+ "Location" : {
  	"rdfs:isDefinedBy" : "dcterms:spatial"
  }
 }

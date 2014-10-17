@@ -202,9 +202,37 @@ def adaptive_field_query(request, predicate, lit_object):
             
             predicate = predicate.replace(namespaces_dict[ns], ns + ":")
     
+
+    query_mapping = simplejson.loads(open(SINDICE_CONFIG_MAPPING, 'r').read())
+
+    label_set = set()
+
+    for map_type in query_mapping:
+
+        for key in query_mapping[map_type]:
+
+            if key == predicate or query_mapping[map_type][key] == predicate:
+
+                label_set.add(map_type)
+
+    select_graphs = set()
+
+    for label in label_set:
+        sindice_query = build_sindice_query(lit_object, label)
+        graphs = select_graph(sindice_query, label)
+        for graph in graphs:
+            select_graphs.add(graph)
+
+    select_graphs = list(select_graphs)
+
+    return simplejson.dumps({"select_graphs" : select_graphs, "lit_object": lit_object})
+
+    """
+
     # Build a sindice query for that type (predicate) and object
     sindice_query = build_sindice_query(lit_object, predicate)
     
     select_graphs = select_graph(sindice_query, predicate)
     
-    return simplejson.dumps({"select_graphs" : select_graphs, "lit_object": lit_object})
+    
+    """

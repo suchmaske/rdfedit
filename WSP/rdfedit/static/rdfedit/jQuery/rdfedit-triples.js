@@ -525,12 +525,13 @@ function show_editbox(cell){
 function update_graph_object(cell){
 /* Update existing triples when having changed an object*/
 
-	var changed_object = $(cell).attr('uri');
+	var changed_object = $(cell).text();
 	
-    var subject = $(cell).parent().siblings(".subject_container").children("#subject").attr('uri');
-	var predicate = $(cell).parent().siblings(".predicate_container").children("#predicate").attr('uri');
-	
-	console.log(changed_object);	
+    var subject = $(cell).parent().siblings(".subject_container").children("#subject").text();
+	var predicate = $(cell).parent().siblings(".predicate_container").children("#predicate").text();
+
+	subject = short_to_full_uri(subject);
+	predicate = short_to_full_uri(predicate);
 	
 	var stock_object_container = create_object_container(stock_value);
 	var object_container = create_object_container(changed_object);
@@ -1086,6 +1087,7 @@ $(document).ready(function() {
 			
 			stock_value = stock_object_cell.text();
 			
+			stock_object_cell.text(selection_full);
 			// Change URI
 			// stock_object_cell.attr("uri", selection_full);
 			

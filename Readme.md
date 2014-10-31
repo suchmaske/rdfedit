@@ -20,5 +20,6 @@ Prequisites:
 
 * jQuery
 * Bootstrap CSS
+* Font Awesome Icons https://fortawesome.github.io/Font-Awesome/
 * Spin.js https://fgnass.github.io/spin.js/
 

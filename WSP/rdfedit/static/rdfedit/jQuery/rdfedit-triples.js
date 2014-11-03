@@ -854,6 +854,7 @@ function implement_fetched_adaptive_field_URIs(data) {
 
 var asInitVals = new Array();
 asInitVals_add = new Array();
+asInitVals_fetch = new Array();
 $(document).ready(function() {
 	
 
@@ -957,6 +958,7 @@ $(document).ready(function() {
         asInitVals_add[i] = this.value;
     } );
 
+
     asInitVals_add_immutable = jQuery.extend(true, {}, asInitVals_add)
 
 	// If an add_box is clicked on and it contains the default value, the box is emptied.
@@ -973,6 +975,30 @@ $(document).ready(function() {
         if ($(this).val() == "") {
             $(this).addClass("add_init");
             $(this).val(asInitVals_add_immutable[$("#add_triple input").index(this)]);
+        }
+    } );
+
+
+    $("#fetch_triple_set input").each(function(i) {
+    	console.log(this.value);
+    	asInitVals_fetch[i] = this.value;
+    });
+
+    asInitVals_fetch_immutable = jQuery.extend(true, {}, asInitVals_fetch);
+
+    $("#fetch_triple_set input").focus( function() {
+		
+        if ($(this).hasClass("add_init")) {
+            $(this).removeClass("add_init");
+            $(this).val("");
+        }
+    } );
+
+
+    $("#fetch_triple_set input").blur( function(i) {
+        if ($(this).val() == "") {
+            $(this).addClass("add_init");
+            $(this).val(asInitVals_fetch_immutable[$("#fetch_triple_set input").index(this)]);
         }
     } );
 

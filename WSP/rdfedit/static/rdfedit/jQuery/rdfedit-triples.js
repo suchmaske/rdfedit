@@ -29,6 +29,7 @@ spinner_opts = {
 
 function undo() {
 
+	console.log(action_stack);
 	// If the action stack and rdfjson stack are not empty
 	if ((rdfjson_stack.length > 0) && (action_stack.length > 0)) {
 
@@ -275,7 +276,7 @@ function add_triple(new_subject, new_predicate, new_object){
 		
 		var new_node = triple_table.fnGetNodes()[triple_table.fnSettings().fnRecordsTotal()-1];
 
-		//triple_table.fnDisplayRow(new_node);
+		triple_table.fnDisplayRow(new_node);
 
 	}	
 
@@ -710,7 +711,7 @@ function update_graph_subject_bulk(apply_icon) {
 		// Check for subject
 		var current_subject = triple_table.fnGetData(i)[0];
 		var current_uri = short_to_full_uri($(current_subject).text());
-		if (current_uri == stock_value) {
+		if (current_uri == stock_value || current_uri == changed_subject) {
 			triple_table.fnUpdate(subject_container, i, 0, 0);
 		}
 		
@@ -718,7 +719,7 @@ function update_graph_subject_bulk(apply_icon) {
 		var current_object = $('<span></span>').append(triple_table.fnGetData(i)[2]);
 		current_uri = short_to_full_uri($(current_object).children("#object").text());
 		
-		if (current_uri == stock_value) {
+		if (current_uri == stock_value || current_uri == changed_subject) {
 			triple_table.fnUpdate(object_container, i, 2, 2);
 		}
 		
@@ -858,12 +859,33 @@ $(document).ready(function() {
 
 	
 	spinner = new Spinner(spinner_opts);
+
+	subject_set_short = new Array();
+
+	$.each(subject_set, function() {
+		var new_short_uri = full_to_short_uri(this);
+		subject_set_short.push(new_short_uri);
+	});
 		
 	predicate_set_short = new Array();
 
-	$.each(predicate_set_full, function() {
+	$.each(predicate_set, function() {
 		var new_short_uri = full_to_short_uri(this);
 		predicate_set_short.push(new_short_uri);
+	});
+
+	object_set_short = new Array();
+
+	$.each(object_set, function() {
+
+		if (valid_uri(this)) {
+			var new_short_uri = full_to_short_uri(this);
+			object_set_short.push(new_short_uri);
+		}
+
+		else {
+			object_set_short.push(this);
+		}
 	});
 
 	/* Declare stack_variables */
@@ -979,13 +1001,14 @@ $(document).ready(function() {
 			"dbpprop"
 		];
 		
-		autocomplete_subject = availableNamespaces.concat(subject_set);
+		autocomplete_subject = availableNamespaces.concat(subject_set_short);
 		autocomplete_predicate = availableNamespaces.concat(predicate_set_short);
+		autocomplete_object = availableNamespaces.concat(object_set_short);
 		
 		
 		$("#add_subject").autocomplete({source: autocomplete_subject});
 		$("#add_predicate").autocomplete({source: autocomplete_predicate});
-		$("#add_object").autocomplete({source: availableNamespaces});
+		$("#add_object").autocomplete({source: autocomplete_object});
 		
 		
 		$("#triple_set_type").autocomplete({source: triple_fetcher_classes});

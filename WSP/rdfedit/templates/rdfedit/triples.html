@@ -110,7 +110,8 @@
 	generic_rdfURL = '{% url "rdf" 999999 %}';
 	base = '{{ base }}'
 	subject_set = JSON.parse('{{ subject_set|escapejs }}');
-	predicate_set_full = JSON.parse('{{ predicate_set|escapejs }}');
+	predicate_set = JSON.parse('{{ predicate_set|escapejs }}');
+  object_set = JSON.parse('{{ object_set|escapejs }}');
 	triple_fetcher_classes = JSON.parse('{{ triple_fetcher_classes | escapejs }}');
 	console.log(triple_fetcher_classes);
 	

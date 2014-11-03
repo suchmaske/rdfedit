@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from django.shortcuts import render_to_response, get_object_or_404, render
 from django.template import RequestContext
 from django.http import HttpResponseRedirect, HttpResponse
@@ -22,6 +24,10 @@ import os
 import cStringIO as StringIO
 
 import simplejson
+import sys
+
+
+reload(sys).setdefaultencoding("utf-8")
 
 """
 Register serializer and parser plugin for correct
@@ -111,6 +117,7 @@ def newgraph(request):
     
     subject_set = {}
     predicate_set = {}
+    object_set = {}
     
     # Determine xml:base
     subject_base_test_set = {triple[0] for triple in triple_list}
@@ -128,7 +135,7 @@ def newgraph(request):
     triple_fetcher_classes = get_triple_fetcher_classes()
     
     response = render_to_response('rdfedit/triples.html', 
-                                  {'rdfjson': rdfjson, 'triple_list': triple_list, 'subject_set':subject_set, 'predicate_set':predicate_set,  'namespaces_dict':simplejson.dumps(namespaces_dict), 'base':base, 'triple_fetcher_classes': triple_fetcher_classes},
+                                  {'rdfjson': rdfjson, 'triple_list': triple_list, 'subject_set':subject_set, 'predicate_set':predicate_set, 'object_set':object_set,  'namespaces_dict':simplejson.dumps(namespaces_dict), 'base':base, 'triple_fetcher_classes': triple_fetcher_classes},
                                   context_instance=RequestContext(request))
     
     return response
@@ -155,13 +162,18 @@ def spo(request, doc_id):
     triple_list = []
     subject_list = []
     predicate_list = []
+    object_list = []
     for s,p,o in graph:
         triple_list.append([s,p,o])
         subject_list.append(str(s).encode('utf-8', 'ignore'))
         predicate_list.append(str(p).encode('utf-8', 'ignore'))
+        print str(o).encode('utf-8', 'ignore')
+        object_list.append(str(o).decode('utf-8', 'ignore'))
+
     
     subject_set = simplejson.dumps(list(set(subject_list)))
     predicate_set = simplejson.dumps(list(set(predicate_list)))
+    object_set = simplejson.dumps(list(set(object_list)))
     
 
     # Determine xml:base
@@ -182,7 +194,7 @@ def spo(request, doc_id):
     rdfjson = graph.serialize(None, format="rdf-json")
     return render_to_response(
         'rdfedit/triples.html',
-        {'rdfjson': rdfjson, 'triple_list': triple_list, 'subject_set':subject_set, 'predicate_set':predicate_set,  'namespaces_dict':simplejson.dumps(namespaces_dict), 'base':base, "triple_fetcher_classes": triple_fetcher_classes},
+        {'rdfjson': rdfjson, 'triple_list': triple_list, 'subject_set':subject_set, 'predicate_set':predicate_set, 'object_set':object_set, 'namespaces_dict':simplejson.dumps(namespaces_dict), 'base':base, "triple_fetcher_classes": triple_fetcher_classes},
         context_instance=RequestContext(request)
     )    
     

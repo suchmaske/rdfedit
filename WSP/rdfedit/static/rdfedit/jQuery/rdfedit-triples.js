@@ -757,7 +757,8 @@ function fetch_graphs() {
 	
 	//
 	var type = "";
-	if ($("#triple_set_type_select_label").text() == "Other") {
+	
+	if ($("#triple_set_type_select_label").val() == "") {
 		type = $("#triple_set_type_input").val()
 	}
 	else {

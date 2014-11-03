@@ -225,7 +225,7 @@ def adaptive_field_query(request, predicate, lit_object):
 
     select_graphs = list(select_graphs)
 
-    return simplejson.dumps({"select_graphs" : select_graphs, "lit_object": lit_object})
+    return simplejson.dumps({"select_graphs" : select_graphs, "lit_object": lit_object}) 
 
     """
 

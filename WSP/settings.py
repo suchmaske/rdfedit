@@ -198,7 +198,9 @@ NAMESPACES_DICT = {
 "wsp":"http://wsp.normdata.rdf/",
 "dbpedia": "http://dbpedia.org/resource/",
 "dbpprop": "http://dbpedia.org/property/",
-"gn": "http://www.geonames.org/ontology#"
+"gn": "http://www.geonames.org/ontology#",
+"wspo": "http://wsp.bbaw.de/avh/Orinoco/",
+"ex": "http://www.example.org/"
 }
 
 

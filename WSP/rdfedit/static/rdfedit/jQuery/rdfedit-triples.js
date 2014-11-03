@@ -934,6 +934,8 @@ $(document).ready(function() {
         asInitVals[i] = this.value;
     } );
 	
+    asInitVals_immutable = jQuery.extend(true, {}, asInitVals);
+
 	// If a search box is clicked on and it contains the default value, the box is emptied.
     $("tfoot input").focus( function() {
         if (this.className == "search_init" ) {
@@ -946,7 +948,7 @@ $(document).ready(function() {
     $("tfoot input").blur( function (i) {
         if ( this.value == "" ) {
             this.className = "search_init";
-            this.value = asInitVals[$("tfoot input").index(this)];
+            this.value = asInitVals_immutable[$("tfoot input").index(this)];
         }
     } );
 
@@ -955,20 +957,22 @@ $(document).ready(function() {
         asInitVals_add[i] = this.value;
     } );
 
+    asInitVals_add_immutable = jQuery.extend(true, {}, asInitVals_add)
+
 	// If an add_box is clicked on and it contains the default value, the box is emptied.
     $("#add_triple input").focus( function() {
 		
         if ($(this).hasClass("add_init")) {
             $(this).removeClass("add_init");
-            $(this).attr("value","");
+            $(this).val("");
         }
     } );
 
 	// If an add_box is left empty, restore the default value
     $("#add_triple input").blur( function(i) {
-        if ($(this).attr("value") == "") {
+        if ($(this).val() == "") {
             $(this).addClass("add_init");
-            $(this).attr("value", asInitVals_add[$("#add_triple input").index(this)]);
+            $(this).val(asInitVals_add_immutable[$("#add_triple input").index(this)]);
         }
     } );
 
@@ -1023,6 +1027,14 @@ $(document).ready(function() {
 	    var new_predicate = $("#add_predicate").val();
 		var new_object = $("#add_object").val();
 		
+		$("tfoot input").each( function (i) {
+        if ( this.value != "" ) {
+            this.className = "search_init";
+            console.log(asInitVals_immutable[$("tfoot input").index(this)]);
+            this.value = asInitVals_immutable[$("tfoot input").index(this)];
+        }
+    	} );
+
 		add_triple(new_subject, new_predicate, new_object);
 		
 	});

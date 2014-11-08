@@ -757,13 +757,18 @@ function fetch_graphs() {
 	
 	//
 	var type = "";
+	console.log(("a" == "a"));
 	
-	if ($("#triple_set_type_select_label").val() == "") {
+
+	if ($("#triple_set_type_select_label").text().indexOf("Other") > -1) {
+		
 		type = $("#triple_set_type_input").val()
 	}
 	else {
 		type = $("#triple_set_type_select_label").text();
 	}
+
+
 
 	// Empty the graph selector list
 	$("#graph_selector").empty();

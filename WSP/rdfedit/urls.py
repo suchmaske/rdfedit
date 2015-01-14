@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import patterns, url, include
 
 urlpatterns = patterns('WSP.rdfedit.views',
     url(r'^index/$', 'index', name='index'),

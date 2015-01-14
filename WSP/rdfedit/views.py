@@ -23,7 +23,7 @@ from rdflib.namespace import Namespace, NamespaceManager
 import os
 import cStringIO as StringIO
 
-import simplejson
+import json
 import sys
 
 
@@ -135,7 +135,7 @@ def newgraph(request):
     triple_fetcher_classes = get_triple_fetcher_classes()
     
     response = render_to_response('rdfedit/triples.html', 
-                                  {'rdfjson': rdfjson, 'triple_list': triple_list, 'subject_set':subject_set, 'predicate_set':predicate_set, 'object_set':object_set,  'namespaces_dict':simplejson.dumps(namespaces_dict), 'base':base, 'triple_fetcher_classes': triple_fetcher_classes},
+                                  {'rdfjson': rdfjson, 'triple_list': triple_list, 'subject_set':subject_set, 'predicate_set':predicate_set, 'object_set':object_set,  'namespaces_dict':json.dumps(namespaces_dict), 'base':base, 'triple_fetcher_classes': triple_fetcher_classes},
                                   context_instance=RequestContext(request))
     
     return response
@@ -171,9 +171,9 @@ def spo(request, doc_id):
         object_list.append(str(o).decode('utf-8', 'ignore'))
 
     
-    subject_set = simplejson.dumps(list(set(subject_list)))
-    predicate_set = simplejson.dumps(list(set(predicate_list)))
-    object_set = simplejson.dumps(list(set(object_list)))
+    subject_set = json.dumps(list(set(subject_list)))
+    predicate_set = json.dumps(list(set(predicate_list)))
+    object_set = json.dumps(list(set(object_list)))
     
 
     # Determine xml:base
@@ -194,7 +194,7 @@ def spo(request, doc_id):
     rdfjson = graph.serialize(None, format="rdf-json")
     return render_to_response(
         'rdfedit/triples.html',
-        {'rdfjson': rdfjson, 'triple_list': triple_list, 'subject_set':subject_set, 'predicate_set':predicate_set, 'object_set':object_set, 'namespaces_dict':simplejson.dumps(namespaces_dict), 'base':base, "triple_fetcher_classes": triple_fetcher_classes},
+        {'rdfjson': rdfjson, 'triple_list': triple_list, 'subject_set':subject_set, 'predicate_set':predicate_set, 'object_set':object_set, 'namespaces_dict':json.dumps(namespaces_dict), 'base':base, "triple_fetcher_classes": triple_fetcher_classes},
         context_instance=RequestContext(request)
     )    
     
@@ -220,11 +220,11 @@ def rdf(request, rdfxml_id):
 def get_triple_fetcher_classes():
     
     # Get available classes for the triple fetcher
-    sindice_query_config = simplejson.loads(open(SINDICE_CONFIG_QUERY, 'r').read())
+    sindice_query_config = json.loads(open(SINDICE_CONFIG_QUERY, 'r').read())
     triple_fetcher_classes = list()
     
     for triple_fetcher_class in sindice_query_config:
         triple_fetcher_classes.append(triple_fetcher_class)
     
-    return simplejson.dumps(list(set(triple_fetcher_classes)))
+    return json.dumps(list(set(triple_fetcher_classes)))
     

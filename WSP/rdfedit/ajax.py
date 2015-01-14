@@ -1,4 +1,3 @@
-from django.utils import simplejson
 from django.http import HttpResponse
 from django.core.servers.basehttp import FileWrapper
 from django.utils.encoding import smart_str, smart_unicode
@@ -20,6 +19,7 @@ from rdflib.plugins.serializers.rdfxml import PrettyXMLSerializer
 import rdflib
 import cStringIO as StringIO
 import urllib2
+import json
 
 import django.contrib.staticfiles
 
@@ -54,7 +54,7 @@ def serialize_graph(request, rdfjson, base):
     graphxml_to_db = RDF_XML(rdfxml_string = graphxml_string)
     graphxml_to_db.save()
 
-    return simplejson.dumps({'message':graphxml_to_db.id}) 
+    return json.dumps({'message':graphxml_to_db.id}) 
 
 @dajaxice_register(method = 'POST')
 def query_sindice(request, keywords, type):
@@ -67,7 +67,7 @@ def query_sindice(request, keywords, type):
     
     #graph_rdfjson = graph.serialize(format="rdf-json")
     
-    return simplejson.dumps({"graph_uris": graph_uris})
+    return json.dumps({"graph_uris": graph_uris})
 
 def build_sindice_query(keywords, type):
     # Build the basic query
@@ -81,7 +81,7 @@ def build_sindice_query(keywords, type):
     query_dict["format"] = "json"
     
     # Read the query config
-    query_config = simplejson.loads(open(SINDICE_CONFIG_QUERY, 'r').read())
+    query_config = json.loads(open(SINDICE_CONFIG_QUERY, 'r').read())
     
     if type in query_config:
         type_config = query_config[type]
@@ -116,7 +116,7 @@ def fetch_triples(request, graph_uri, type):
     print graph_uri
     
     # Get the mapping
-    query_mapping = simplejson.loads(open(SINDICE_CONFIG_MAPPING, 'r').read())
+    query_mapping = json.loads(open(SINDICE_CONFIG_MAPPING, 'r').read())
     
     # Create a new graph
     new_graph = Graph()
@@ -162,14 +162,14 @@ def fetch_triples(request, graph_uri, type):
         for row in new_graph.query(spo_query):
             triple_list.append([row.s, row.p, row.o])
     
-        return simplejson.dumps({"triple_list": triple_list})
+        return json.dumps({"triple_list": triple_list})
     
 def select_graph(sindice_query, type):
     
     print sindice_query
     
     # Get the mapping
-    query_mapping = simplejson.loads(open(SINDICE_CONFIG_MAPPING, 'r').read())
+    query_mapping = json.loads(open(SINDICE_CONFIG_MAPPING, 'r').read())
     
     if type in query_mapping:
         
@@ -180,7 +180,7 @@ def select_graph(sindice_query, type):
         request = urllib2.urlopen(sindice_query, None)
 
         # Parse the result into a json variable
-        result = simplejson.loads(request.read())
+        result = json.loads(request.read())
         
         # Create a new list
         graph_uris = list()
@@ -203,7 +203,7 @@ def adaptive_field_query(request, predicate, lit_object):
             predicate = predicate.replace(namespaces_dict[ns], ns + ":")
     
 
-    query_mapping = simplejson.loads(open(SINDICE_CONFIG_MAPPING, 'r').read())
+    query_mapping = json.loads(open(SINDICE_CONFIG_MAPPING, 'r').read())
 
     label_set = set()
 
@@ -225,7 +225,7 @@ def adaptive_field_query(request, predicate, lit_object):
 
     select_graphs = list(select_graphs)
 
-    return simplejson.dumps({"select_graphs" : select_graphs, "lit_object": lit_object}) 
+    return json.dumps({"select_graphs" : select_graphs, "lit_object": lit_object}) 
 
     """
 

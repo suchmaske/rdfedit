@@ -4,126 +4,162 @@
 
 {% block content %}
 
-<div class="triple_table_wrapper">
 
-<table id="triples" cellpadding="0" cellspacing="0" border="0" class="table table-bordered highlight-row">
+    <div id="import-config-table-wrapper">
 
-  <thead>
-    <th>Subject</th>
-    <th>Predicate</th>
-    <th>Object</th>
-  </thead>
+        <table id="import-config-table">
+            <tr>
+                <th rowspan="2">Type</th>
+                <th colspan="2">Query Config</th>
+                <th colspan="2">Mapping Config</th>
+            </tr>
+            <tr class="subheading">
+                <td>Query Parameter</td>
+                <td>Value</td>
+                <td>Original Predicate</td>
+                <td>New Predicate</td>
+            </tr>
 
-  <tbody>
-    {% for triple in triple_list %}
-    <tr id="row">
+            {% for import_type in import_config_dj.import_label_lengths %}
 
-      <!--  <td id="subject" uri="{{ triple.0 }}" contentEditable>{{ triple.0 }}</td> -->
-      
-      <td>
-      
-      	<span id="subject" contentEditable>{{ triple.0 }}</span>
-      	
-      </td>
-	
-	  <td>
-      	<span id="predicate" rel="tooltip" title="{{ triple.1 }}">{{ triple.1 }}</span>
-	  </td>
-
-      <td>
-
-		<span id="object-icon-wrapper"><i id="object-icon" class="icon-white"></i></span>
-
-        <span id="object" contentEditable>{{ triple.2 }}</span>
-
-		<span id="delete_triple"><i class="icon-black icon-remove-sign"></i></span>
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-
-  <tfoot>
-    <tr>
-      <th><input type="text" name="search_subject" value="Search subject" class="search_init" /></th>
-      <th><input type="text" name="search_predicate" value="Search predicate" class="search_init" /></th>
-      <th><input type="text" name="search_object" value="Search object" class="search_init" /></th>
-  </tfoot>
-</table>
-</div>
+                <tr>
+                    <td rowspan="{{ import_config_dj.import_label_lengths|get_item:import_type }}">{{ import_type }}</td>
 
 
-<div>
-<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered">
-	
-	<!-- Add single triple -->
-	<tr id="add_triple">
-      <th><input id="add_subject" class="add_init" type="text" value="Add subject"></th>
-      <th><input id="add_predicate" class="add_init" type="text" value="Add predicate" /></th>
-      <th>
-        <input id="add_object" class="add_init" type="text" value="Add object" />
-        <button id="add_button" class="btn btn-primary"><i class="icon-white icon-plus-sign"></i> <span>Add triple</span></button>
-      </th>
-    </tr>
-    
-    <tr id="fetch_triple_set">
-    	<th><input id="triple_set_keywords" class="add_init" type="text" value="Enter Import Keywords"></th>
-    	
-    	<th> <!-- Add a bootstrap dropdown menu to select the fetcher type -->
-    		<div class="btn-group">
-    			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="triple_set_type_select_label" >Other
-    			<span class="caret"></span>
-    			</button>
-    			<ul id="triple_set_type_select" class="dropdown-menu">
-    				<li><a href="#">Other</a></li>
-    			</ul>
-    		</div>
-    	 
-    		<input id="triple_set_type_input" class="add_init" type="text" value="Choose Type">
-    	</th>
-    	<th>
-  			<div class="btn-group">
-    			<button id="fetch_triple_set_button" class="btn btn-info"><i class="icon-white icon-repeat"></i> Fetch graphs</button>
-    			
-    			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="graph_selector_label">
-    				Choose Graph
-    				<span class="caret"></span>
-    			</button>
-    			<ul id="graph_selector" class="dropdown-menu">
-    			</ul>
-    		</div>
-    	</th>
-    </tr>
-</table>
-</div>
 
-<button id="rdf_export_button" class="btn btn-primary"><i class="icon-white icon-download"></i> Download as RDF/XML</button>
-<button id="undo_button" class="btn btn-primary"><i class="icon-white icon-undo"></i> Undo</button>
+                </tr>
+
+            {% endfor %}
+        </table>
+
+    </div>
+
+    <div class="triple_table_wrapper">
+
+        <table id="triples" cellpadding="0" cellspacing="0" border="0" class="table table-bordered highlight-row">
+
+            <thead>
+            <th>Subject</th>
+            <th>Predicate</th>
+            <th>Object</th>
+            </thead>
+
+            <tbody>
+            {% for triple in triple_list %}
+                <tr id="row">
+
+                    <!--  <td id="subject" uri="{{ triple.0 }}" contentEditable>{{ triple.0 }}</td> -->
+
+                    <td>
+
+                        <span id="subject" contentEditable>{{ triple.0 }}</span>
+
+                    </td>
+
+                    <td>
+                        <span id="predicate" rel="tooltip" title="{{ triple.1 }}">{{ triple.1 }}</span>
+                    </td>
+
+                    <td>
+
+                        <span id="object-icon-wrapper"><i id="object-icon" class="icon-white"></i></span>
+
+                        <span id="object" contentEditable>{{ triple.2 }}</span>
+
+                        <span id="delete_triple"><i class="icon-black icon-remove-sign"></i></span>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+
+            <tfoot>
+            <tr>
+                <th><input type="text" name="search_subject" value="Search subject" class="search_init"/></th>
+                <th><input type="text" name="search_predicate" value="Search predicate" class="search_init"/></th>
+                <th><input type="text" name="search_object" value="Search object" class="search_init"/></th>
+            </tfoot>
+        </table>
+    </div>
+
+
+    <div>
+        <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered">
+
+            <!-- Add single triple -->
+            <tr id="add_triple">
+                <th><input id="add_subject" class="add_init" type="text" value="Add subject"></th>
+                <th><input id="add_predicate" class="add_init" type="text" value="Add predicate"/></th>
+                <th>
+                    <input id="add_object" class="add_init" type="text" value="Add object"/>
+                    <button id="add_button" class="btn btn-primary"><i class="icon-white icon-plus-sign"></i> <span>Add triple</span>
+                    </button>
+                </th>
+            </tr>
+
+            <tr id="fetch_triple_set">
+                <th><input id="triple_set_keywords" class="add_init" type="text" value="Enter Import Keywords"></th>
+
+                <th> <!-- Add a bootstrap dropdown menu to select the fetcher type -->
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                id="triple_set_type_select_label">Other
+                            <span class="caret"></span>
+                        </button>
+                        <ul id="triple_set_type_select" class="dropdown-menu">
+                            <li><a href="#">Other</a></li>
+                        </ul>
+                    </div>
+
+                    <input id="triple_set_type_input" class="add_init" type="text" value="Choose Type">
+                </th>
+                <th>
+                    <div class="btn-group">
+                        <button id="fetch_triple_set_button" class="btn btn-info"><i class="icon-white icon-repeat"></i>
+                            Fetch graphs
+                        </button>
+
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                id="graph_selector_label">
+                            Choose Graph
+                            <span class="caret"></span>
+                        </button>
+                        <ul id="graph_selector" class="dropdown-menu">
+                        </ul>
+                    </div>
+                </th>
+            </tr>
+        </table>
+    </div>
+
+    <button id="rdf_export_button" class="btn btn-primary"><i class="icon-white icon-download"></i> Download as RDF/XML
+    </button>
+    <button id="undo_button" class="btn btn-primary"><i class="icon-white icon-undo"></i> Undo</button>
 {% endblock %}
 
 {% block templatescripts %}
 
-<script>
-/* Load RDFJSON from Django */
-	rdfjson = JSON.parse('{{ rdfjson|escapejs }}');
-	namespaces_dict = JSON.parse('{{ namespaces_dict|escapejs }}');
-	base = '{{ base }}'
-	subject_set = JSON.parse('{{ subject_set|escapejs }}');
-	predicate_set = JSON.parse('{{ predicate_set|escapejs }}');
-    generic_rdfURL = '{% url "rdf" 999999 %}';
-    object_set = JSON.parse('{{ object_set|escapejs }}');
-	triple_fetcher_classes = JSON.parse('{{ triple_fetcher_classes | escapejs }}');
-	import_config = JSON.parse('{{ import_config | escapejs }}');
-	
-</script>
+    <script>
+        /* Load RDFJSON from Django */
+        rdfjson = JSON.parse('{{ rdfjson|escapejs }}');
+        namespaces_dict = JSON.parse('{{ namespaces_dict|escapejs }}');
+        base = '{{ base }}'
+        subject_set = JSON.parse('{{ subject_set|escapejs }}');
+        predicate_set = JSON.parse('{{ predicate_set|escapejs }}');
+        generic_rdfURL = '{% url "rdf" 999999 %}';
+        object_set = JSON.parse('{{ object_set|escapejs }}');
+        triple_fetcher_classes = JSON.parse('{{ triple_fetcher_classes | escapejs }}');
+        import_config = JSON.parse('{{ import_config | escapejs }}');
 
-{% load staticfiles %}
-<script src="{% static 'rdfedit/jQuery/jquery.dataTables.js' %}"></script>
-<script src="{% static 'rdfedit/jQuery/dataTables.fnDisplayRow.js' %}"></script>
-<script src="{% static 'rdfedit/jQuery/rdfedit-triples.js' %}"></script>
-<script src="{% static 'rdfedit/jQuery/DT_bootstrap.js' %}"></script>
-<script src="{% static 'rdfedit/jQuery/spin.js' %}"></script>
-<link rel="stylesheet" type="text/css" href="{% static 'rdfedit/bootstrap/css/DT_bootstrap.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'rdfedit/css/rdfedit-triples.css' %}" />
+    </script>
+
+    {% load staticfiles %}
+    <script src="{% static 'rdfedit/jQuery/jquery.dataTables.js' %}"></script>
+    <script src="{% static 'rdfedit/jQuery/dataTables.fnDisplayRow.js' %}"></script>
+    <script src="{% static 'rdfedit/jQuery/rdfedit-triples.js' %}"></script>
+    <script src="{% static 'rdfedit/jQuery/DT_bootstrap.js' %}"></script>
+    <script src="{% static 'rdfedit/jQuery/spin.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'rdfedit/bootstrap/css/DT_bootstrap.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'rdfedit/css/rdfedit-triples.css' %}"/>
 {% endblock %}
 
 {% block dropdown-tools %}
@@ -136,4 +172,4 @@
 
 {% block templatestyles %}
 
-{% endblock %} 
+{% endblock %}

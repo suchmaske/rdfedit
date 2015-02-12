@@ -1165,9 +1165,6 @@ $(document).ready(function() {
     $("#dropdown_import-config").click(function () {
 
 
-        console.log(import_config);
-
-
 
     });
 

@@ -59,3 +59,25 @@ thead, tfoot, #add_triple th {
 #apply_globally {
 	cursor: pointer;
 }
+
+
+#import-config-table-wrapper{
+    width: 50%;
+    margin-left: 5%
+}
+
+#import-config-table {
+    border: 1px solid black;
+}
+
+#import-config-table tr {
+    border-bottom: 1px solid black;
+}
+
+#import-config-table tr.subheading td{
+    text-align: center;
+}
+
+#import-config-table th, #import-config-table td {
+    border: 1px solid black
+}

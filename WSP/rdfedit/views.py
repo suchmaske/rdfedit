@@ -2,6 +2,7 @@
 
 from django.shortcuts import render_to_response, get_object_or_404, render
 from django.template import RequestContext
+from django.template.defaulttags import register
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.core.files import File
@@ -201,8 +202,19 @@ def spo(request, doc_id):
     # Get the config files
     mapping_config = json.loads(open(SINDICE_CONFIG_MAPPING, 'r').read())
     query_config = json.loads(open(SINDICE_CONFIG_QUERY, 'r').read())
+    import_label_lengths = dict()
 
-    import_config = {"query" : query_config, "mapping" : mapping_config}
+
+    for tf_class in triple_fetcher_classes:
+        mapping_length = len(mapping_config[tf_class])
+        query_length = len(query_config[tf_class])
+
+        if mapping_length >= query_length:
+            import_label_lengths[tf_class] = mapping_length
+        else:
+            import_label_lengths[tf_class] = query_length
+
+    import_config = {"query": query_config, "mapping": mapping_config, "import_label_lengths": import_label_lengths}
 
     # Serialize graph to RDFJson
     rdfjson = graph.serialize(None, format="rdf-json")
@@ -215,8 +227,9 @@ def spo(request, doc_id):
          'object_set':object_set,
          'namespaces_dict':json.dumps(namespaces_dict),
          'base':base,
-         "triple_fetcher_classes": triple_fetcher_classes,
-         "import_config": json.dumps(import_config)},
+         "triple_fetcher_classes": json.dumps(triple_fetcher_classes),
+         "import_config": json.dumps(import_config),
+         "import_config_dj" : import_config},
         context_instance=RequestContext(request)
     )    
     
@@ -250,5 +263,9 @@ def get_triple_fetcher_classes():
     for triple_fetcher_class in sindice_query_config:
         triple_fetcher_classes.append(triple_fetcher_class)
     
-    return json.dumps(list(set(triple_fetcher_classes)))
+    return list(set(triple_fetcher_classes))
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)
     

@@ -10,7 +10,7 @@ from django.conf import settings
 
 from dajaxice.core import dajaxice_functions
 
-from WSP.settings import NAMESPACES_DICT, SINDICE_CONFIG_QUERY
+from WSP.settings import NAMESPACES_DICT, SINDICE_CONFIG_QUERY, SINDICE_CONFIG_MAPPING
 from WSP.rdfedit.models import Document, RDF_XML
 from WSP.rdfedit.forms import DocumentForm, DeleteForm, EndpointForm
 from WSP.rdfedit.spo2rdfjson import spo2rdfjson
@@ -93,9 +93,16 @@ def delete(request):
 
 def getrdf(doc_id):
 # Load RDF-graph object by document ID in the Database
+
     doc = Document.objects.get(pk = doc_id)
     graph = Graph()
-    graph.load(doc.docfile)
+
+    if doc.docfile.name.split(".")[-1] == "ttl":
+        graph.load(doc.docfile, format="turtle")
+
+    else:
+        graph.load(doc.docfile)
+
     return graph
 
 def newgraph(request):
@@ -152,6 +159,7 @@ def spo(request, doc_id):
 
     if type(doc_id) == int or doc_id == "1":
     # If doc_id is an integer, a file was uploaded. If doc_id is the string "1", the example is parsed.
+
         graph = getrdf(doc_id)
     else:
     # If doc_id is not an integer, therefore a string, an SPARQL-endpoint url is being parsed
@@ -167,7 +175,7 @@ def spo(request, doc_id):
         triple_list.append([s,p,o])
         subject_list.append(str(s).encode('utf-8', 'ignore'))
         predicate_list.append(str(p).encode('utf-8', 'ignore'))
-        print str(o).encode('utf-8', 'ignore')
+        #print str(o).encode('utf-8', 'ignore')
         object_list.append(str(o).decode('utf-8', 'ignore'))
 
     
@@ -190,23 +198,39 @@ def spo(request, doc_id):
     
     triple_fetcher_classes = get_triple_fetcher_classes()
 
+    # Get the config files
+    mapping_config = json.loads(open(SINDICE_CONFIG_MAPPING, 'r').read())
+    query_config = json.loads(open(SINDICE_CONFIG_QUERY, 'r').read())
+
+    import_config = {"query" : query_config, "mapping" : mapping_config}
+
     # Serialize graph to RDFJson
     rdfjson = graph.serialize(None, format="rdf-json")
     return render_to_response(
         'rdfedit/triples.html',
-        {'rdfjson': rdfjson, 'triple_list': triple_list, 'subject_set':subject_set, 'predicate_set':predicate_set, 'object_set':object_set, 'namespaces_dict':json.dumps(namespaces_dict), 'base':base, "triple_fetcher_classes": triple_fetcher_classes},
+        {'rdfjson': rdfjson,
+         'triple_list': triple_list,
+         'subject_set':subject_set,
+         'predicate_set':predicate_set,
+         'object_set':object_set,
+         'namespaces_dict':json.dumps(namespaces_dict),
+         'base':base,
+         "triple_fetcher_classes": triple_fetcher_classes,
+         "import_config": json.dumps(import_config)},
         context_instance=RequestContext(request)
     )    
     
 def rdf(request, rdfxml_id):
-    # Get RDF/XML from the database 
+    # Get RDF/XML from the database
+
     rdfxml_object = RDF_XML.objects.get(pk = rdfxml_id)
     rdfxml_string = rdfxml_object.rdfxml_string
+
 
     # Create virtual file and write the RDF/XML string into it
     rdfxml_file = StringIO.StringIO()
     rdfxml_file.write(rdfxml_string.encode('utf-8', 'ignore'))
-   
+
     # Register response as file download
     response = HttpResponse(rdfxml_file.getvalue(), content_type='application/xml')
     response['Content-Disposition'] = 'attachment; filename="rdf.xml"'

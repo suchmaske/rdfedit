@@ -44,3 +44,11 @@
 		padding-top: 4px;
 		padding-left: 2px;
 	}
+
+    .dropdown-menu > li > a {
+        cursor: pointer
+    }
+
+    #import-config-overlay{
+        display: none;
+    }

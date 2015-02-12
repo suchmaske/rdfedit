@@ -234,7 +234,7 @@ function add_triple(new_subject, new_predicate, new_object){
 		/* If the new object is a literal, try to fetch a relevant URI */
 		else {
 			
-			Dajaxice.WSP.rdfedit.adaptive_field_query(implement_fetched_adaptive_field_URIs, {"predicate": new_predicate, "lit_object": new_object});
+			Dajaxice.WSP.rdfedit.adaptive_field_query(implement_fetched_adaptive_field_URIs, {"predicate": new_predicate, "lit_object": new_object, "import_config": import_config});
 						
 		}
 
@@ -777,7 +777,7 @@ function fetch_graphs() {
 	var spinner_target = document.getElementById("fetch_triple_set_button");
 	spinner.spin(spinner_target);
 	
-	Dajaxice.WSP.rdfedit.query_sindice(implement_fetched_graph_uris, {'keywords': keywords, 'type': type});
+	Dajaxice.WSP.rdfedit.query_sindice(implement_fetched_graph_uris, {'keywords': keywords, 'type': type, "import_config": import_config});
 }
 
 function fetch_triples(graph_uri) {
@@ -794,7 +794,7 @@ function fetch_triples(graph_uri) {
 	var spinner_target = document.getElementById("graph_selector_label");
 	spinner.spin(spinner_target);
 	
-	Dajaxice.WSP.rdfedit.fetch_triples(implement_fetched_triples, {'graph_uri': graph_uri, 'type': type});
+	Dajaxice.WSP.rdfedit.fetch_triples(implement_fetched_triples, {'graph_uri': graph_uri, 'type': type, "query_mapping" : import_config["mapping"]});
 	
 }
 
@@ -1161,6 +1161,14 @@ $(document).ready(function() {
 			update_graph_object(stock_object_cell.get(0));
 			
 	});
-	
+
+    $("#dropdown_import-config").click(function () {
+
+
+        console.log(import_config);
+
+
+
+    });
 
 });

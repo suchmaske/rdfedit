@@ -47,21 +47,23 @@ def serialize_graph(request, rdfjson, base):
         """
         graphxml_string = editgraph.serialize(format="pretty-xml").decode('utf-8', 'ignore')
         graphxml_string = graphxml_string.replace('rdf:RDF\n', 'rdf:RDF\n  xml:base="' + base +'"\n')
-        print graphxml_string
+        # print graphxml_string
     else:
         graphxml_string = editgraph.serialize(format="pretty-xml")
 
     graphxml_to_db = RDF_XML(rdfxml_string = graphxml_string)
     graphxml_to_db.save()
+    print graphxml_to_db.id
 
     return json.dumps({'message':graphxml_to_db.id}) 
 
 @dajaxice_register(method = 'POST')
-def query_sindice(request, keywords, type):
+def query_sindice(request, keywords, type, import_config):
+
+
+    sindice_query = build_sindice_query(keywords, type, import_config["query"])
     
-    sindice_query = build_sindice_query(keywords, type)
-    
-    graph_uris = select_graph(sindice_query, type)
+    graph_uris = select_graph(sindice_query, type, import_config["mapping"])
     
     # graph = fetch_triples(sindice_query, type)
     
@@ -69,7 +71,7 @@ def query_sindice(request, keywords, type):
     
     return json.dumps({"graph_uris": graph_uris})
 
-def build_sindice_query(keywords, type):
+def build_sindice_query(keywords, type, query_config):
     # Build the basic query
     query = SINDICE_API_URL
     
@@ -81,8 +83,9 @@ def build_sindice_query(keywords, type):
     query_dict["format"] = "json"
     
     # Read the query config
-    query_config = json.loads(open(SINDICE_CONFIG_QUERY, 'r').read())
-    
+    #query_config = json.loads(open(SINDICE_CONFIG_QUERY, 'r').read())
+
+
     if type in query_config:
         type_config = query_config[type]
         
@@ -111,12 +114,12 @@ def build_sindice_query(keywords, type):
     return query
 
 @dajaxice_register(method = 'POST')
-def fetch_triples(request, graph_uri, type):
+def fetch_triples(request, graph_uri, type, query_mapping):
     
     print graph_uri
     
     # Get the mapping
-    query_mapping = json.loads(open(SINDICE_CONFIG_MAPPING, 'r').read())
+    #query_mapping = json.loads(open(SINDICE_CONFIG_MAPPING, 'r').read())
     
     # Create a new graph
     new_graph = Graph()
@@ -153,7 +156,7 @@ def fetch_triples(request, graph_uri, type):
                 new_uri = URIRef(type_mapping[orig_uri].replace(new_uri_prefix + ":", namespaces_dict[new_uri_prefix]))
                 
             for row in external_graph.query(sparql_query):
-                print row   
+                #print row
                 new_graph.add((row.s, new_uri, row.o))
         
         # Get all triples from the new graph
@@ -164,12 +167,13 @@ def fetch_triples(request, graph_uri, type):
     
         return json.dumps({"triple_list": triple_list})
     
-def select_graph(sindice_query, type):
+def select_graph(sindice_query, type, query_mapping):
     
     print sindice_query
     
     # Get the mapping
-    query_mapping = json.loads(open(SINDICE_CONFIG_MAPPING, 'r').read())
+    # query_mapping = import_config["mapping"]
+    #query_mapping = json.loads(open(SINDICE_CONFIG_MAPPING, 'r').read())
     
     if type in query_mapping:
         
@@ -192,7 +196,7 @@ def select_graph(sindice_query, type):
         return graph_uris
     
 @dajaxice_register(method = 'POST')
-def adaptive_field_query(request, predicate, lit_object):
+def adaptive_field_query(request, predicate, lit_object, import_config):
     
     predicate = predicate.encode("ascii", 'ignore')
     
@@ -203,7 +207,8 @@ def adaptive_field_query(request, predicate, lit_object):
             predicate = predicate.replace(namespaces_dict[ns], ns + ":")
     
 
-    query_mapping = json.loads(open(SINDICE_CONFIG_MAPPING, 'r').read())
+    #query_mapping = json.loads(open(SINDICE_CONFIG_MAPPING, 'r').read())
+    query_mapping = import_config["mapping"]
 
     label_set = set()
 
@@ -218,8 +223,8 @@ def adaptive_field_query(request, predicate, lit_object):
     select_graphs = set()
 
     for label in label_set:
-        sindice_query = build_sindice_query(lit_object, label)
-        graphs = select_graph(sindice_query, label)
+        sindice_query = build_sindice_query(lit_object, label, import_config["query"])
+        graphs = select_graph(sindice_query, label, import_config)
         for graph in graphs:
             select_graphs.add(graph)
 

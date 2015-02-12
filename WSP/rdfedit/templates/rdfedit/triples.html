@@ -96,7 +96,7 @@
 </table>
 </div>
 
-<button id="rdf_export_button" class="btn btn-primary"><i class="icon-white icon-download"></i> Parse to RDF</button>
+<button id="rdf_export_button" class="btn btn-primary"><i class="icon-white icon-download"></i> Download as RDF/XML</button>
 <button id="undo_button" class="btn btn-primary"><i class="icon-white icon-undo"></i> Undo</button>
 {% endblock %}
 
@@ -106,13 +106,13 @@
 /* Load RDFJSON from Django */
 	rdfjson = JSON.parse('{{ rdfjson|escapejs }}');
 	namespaces_dict = JSON.parse('{{ namespaces_dict|escapejs }}');
-	generic_rdfURL = '{% url "rdf" 999999 %}';
 	base = '{{ base }}'
 	subject_set = JSON.parse('{{ subject_set|escapejs }}');
 	predicate_set = JSON.parse('{{ predicate_set|escapejs }}');
-  object_set = JSON.parse('{{ object_set|escapejs }}');
+    generic_rdfURL = '{% url "rdf" 999999 %}';
+    object_set = JSON.parse('{{ object_set|escapejs }}');
 	triple_fetcher_classes = JSON.parse('{{ triple_fetcher_classes | escapejs }}');
-	console.log(triple_fetcher_classes);
+	import_config = JSON.parse('{{ import_config | escapejs }}');
 	
 </script>
 
@@ -128,8 +128,9 @@
 
 {% block dropdown-tools %}
 
-<li id="dropdown_undo"><a><i class="icon-black icon-undo"></i> Undo</a></li>
-<li id="dropdown_rdf_export"><a><i class="icon black icon-download"></i> Parse to RDF</a></li>
+    <li id="dropdown_undo"><a><i class="icon-black icon-undo"></i> Undo</a></li>
+    <li id="dropdown_rdf_export"><a><i class="icon black icon-download"></i> Download as RDF/XML</a></li>
+    <li id="dropdown_import-config"><a><i class="icon black icon-wrench"></i> Import/Mapping Configuration</a></li>
 
 {% endblock %}
 

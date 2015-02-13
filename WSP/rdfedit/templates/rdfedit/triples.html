@@ -5,35 +5,6 @@
 {% block content %}
 
 
-    <div id="import-config-table-wrapper">
-
-        <table id="import-config-table">
-            <tr>
-                <th rowspan="2">Type</th>
-                <th colspan="2">Query Config</th>
-                <th colspan="2">Mapping Config</th>
-            </tr>
-            <tr class="subheading">
-                <td>Query Parameter</td>
-                <td>Value</td>
-                <td>Original Predicate</td>
-                <td>New Predicate</td>
-            </tr>
-
-            {% for import_type in import_config_dj.import_label_lengths %}
-
-                <tr>
-                    <td rowspan="{{ import_config_dj.import_label_lengths|get_item:import_type }}">{{ import_type }}</td>
-
-
-
-                </tr>
-
-            {% endfor %}
-        </table>
-
-    </div>
-
     <div class="triple_table_wrapper">
 
         <table id="triples" cellpadding="0" cellspacing="0" border="0" class="table table-bordered highlight-row">

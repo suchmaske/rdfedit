@@ -224,11 +224,13 @@ def adaptive_field_query(request, predicate, lit_object, import_config):
 
     for label in label_set:
         sindice_query = build_sindice_query(lit_object, label, import_config["query"])
-        graphs = select_graph(sindice_query, label, import_config)
+        graphs = select_graph(sindice_query, label, import_config["mapping"])
         for graph in graphs:
             select_graphs.add(graph)
 
     select_graphs = list(select_graphs)
+
+    print select_graphs
 
     return json.dumps({"select_graphs" : select_graphs, "lit_object": lit_object}) 
 

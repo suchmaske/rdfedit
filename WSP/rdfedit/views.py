@@ -36,26 +36,27 @@ interpretation and output of RDFJson and RDF/XML.
 """
 
 plugin.register("rdf-json", Parser,
-   "rdflib_rdfjson.rdfjson_parser", "RdfJsonParser")
+                "rdflib_rdfjson.rdfjson_parser", "RdfJsonParser")
 
 plugin.register("rdf-json", Serializer,
-    "rdflib_rdfjson.rdfjson_serializer", "RdfJsonSerializer")
+                "rdflib_rdfjson.rdfjson_serializer", "RdfJsonSerializer")
 
 plugin.register("rdf-json-pretty", Serializer,
-    "rdflib_rdfjson.rdfjson_serializer", "PrettyRdfJsonSerializer")
+                "rdflib_rdfjson.rdfjson_serializer", "PrettyRdfJsonSerializer")
 
 
 # Create dictionary for namespaces for later bindings and display in the spo-view.
 namespaces_dict = NAMESPACES_DICT
 
+
 def index(request):
     # Handle file upload
 
     if request.method == 'POST':
-    #If upload-button is pressed, upload selected file and display spo-view. 
+        # If upload-button is pressed, upload selected file and display spo-view.
         form = DocumentForm(request.POST, request.FILES)
         if form.is_valid():
-            newdoc = Document(docfile = request.FILES['docfile'])
+            newdoc = Document(docfile=request.FILES['docfile'])
             newdoc.save()
             doc_id = newdoc.id
 
@@ -69,7 +70,7 @@ def index(request):
 
     else:
         delete(request)
-        form = DocumentForm() # A empty, unbound form
+        form = DocumentForm()  # A empty, unbound form
         endpoint_form = EndpointForm()
 
     # Load documents for the list page
@@ -82,20 +83,22 @@ def index(request):
         context_instance=RequestContext(request)
     )
 
+
 def delete(request):
-# Delete all files that were uploaded by users.
+    # Delete all files that were uploaded by users.
     del_id_list = [doc.id for doc in Document.objects.all()]
     for del_id in del_id_list:
-        del_doc = Document.objects.get(pk = del_id)
+        del_doc = Document.objects.get(pk=del_id)
         if del_id != 1:
             os.remove(os.path.join(settings.MEDIA_ROOT, del_doc.docfile.name))
             del_doc.delete()
     return HttpResponseRedirect(reverse('WSP.rdfedit.views.index'))
 
-def getrdf(doc_id):
-# Load RDF-graph object by document ID in the Database
 
-    doc = Document.objects.get(pk = doc_id)
+def getrdf(doc_id):
+    # Load RDF-graph object by document ID in the Database
+
+    doc = Document.objects.get(pk=doc_id)
     graph = Graph()
 
     if doc.docfile.name.split(".")[-1] == "ttl":
@@ -106,27 +109,27 @@ def getrdf(doc_id):
 
     return graph
 
+
 def newgraph(request):
-    
     print request.method
-    
+
     # Create and bind namespaces
     namespace_manager = NamespaceManager(Graph())
     for ns in namespaces_dict:
         namespace_manager.bind(ns, Namespace(namespaces_dict[ns]))
-    
+
     # Create a new graph
     graph = Graph()
     graph.namespace_manager = namespace_manager
-    
+
     triple_list = []
     subject_list = []
     predicate_list = []
-    
+
     subject_set = {}
     predicate_set = {}
     object_set = {}
-    
+
     # Determine xml:base
     subject_base_test_set = {triple[0] for triple in triple_list}
     base_set = {subject[:subject.rfind("/")] for subject in subject_base_test_set}
@@ -135,22 +138,24 @@ def newgraph(request):
         base = str(list(base_set)[0]) + "/"
     else:
         base = ""
-    
+
     # Serialize graph
     rdfjson = graph.serialize(None, format="rdf-json")
-    
+
     # 
     triple_fetcher_classes = get_triple_fetcher_classes()
-    
-    response = render_to_response('rdfedit/triples.html', 
-                                  {'rdfjson': rdfjson, 'triple_list': triple_list, 'subject_set':subject_set, 'predicate_set':predicate_set, 'object_set':object_set,  'namespaces_dict':json.dumps(namespaces_dict), 'base':base, 'triple_fetcher_classes': triple_fetcher_classes},
+
+    response = render_to_response('rdfedit/triples.html',
+                                  {'rdfjson': rdfjson, 'triple_list': triple_list, 'subject_set': subject_set,
+                                   'predicate_set': predicate_set, 'object_set': object_set,
+                                   'namespaces_dict': json.dumps(namespaces_dict), 'base': base,
+                                   'triple_fetcher_classes': triple_fetcher_classes},
                                   context_instance=RequestContext(request))
-    
+
     return response
-    
+
 
 def spo(request, doc_id):
-    
     # Create and bind namespaces
     namespace_manager = NamespaceManager(Graph())
     for ns in namespaces_dict:
@@ -159,31 +164,30 @@ def spo(request, doc_id):
     # Load graph from the uploaded file
 
     if type(doc_id) == int or doc_id == "1":
-    # If doc_id is an integer, a file was uploaded. If doc_id is the string "1", the example is parsed.
+        # If doc_id is an integer, a file was uploaded. If doc_id is the string "1", the example is parsed.
 
         graph = getrdf(doc_id)
     else:
-    # If doc_id is not an integer, therefore a string, an SPARQL-endpoint url is being parsed
+        # If doc_id is not an integer, therefore a string, an SPARQL-endpoint url is being parsed
         graph = Graph()
-        graph.parse(data=spo2rdfjson(doc_id), format="rdf-json") 
+        graph.parse(data=spo2rdfjson(doc_id), format="rdf-json")
 
-    # Generate list of triples
+        # Generate list of triples
     triple_list = []
     subject_list = []
     predicate_list = []
     object_list = []
-    for s,p,o in graph:
-        triple_list.append([s,p,o])
+    for s, p, o in graph:
+        triple_list.append([s, p, o])
         subject_list.append(str(s).encode('utf-8', 'ignore'))
         predicate_list.append(str(p).encode('utf-8', 'ignore'))
-        #print str(o).encode('utf-8', 'ignore')
+        # print str(o).encode('utf-8', 'ignore')
         object_list.append(str(o).decode('utf-8', 'ignore'))
 
-    
     subject_set = json.dumps(list(set(subject_list)))
     predicate_set = json.dumps(list(set(predicate_list)))
     object_set = json.dumps(list(set(object_list)))
-    
+
 
     # Determine xml:base
     subject_base_test_set = {triple[0] for triple in triple_list}
@@ -196,14 +200,13 @@ def spo(request, doc_id):
 
     # Insert namespaces into graph
     graph.namespace_manager = namespace_manager
-    
+
     triple_fetcher_classes = get_triple_fetcher_classes()
 
     # Get the config files
     mapping_config = json.loads(open(SINDICE_CONFIG_MAPPING, 'r').read())
     query_config = json.loads(open(SINDICE_CONFIG_QUERY, 'r').read())
     import_label_lengths = dict()
-
 
     for tf_class in triple_fetcher_classes:
         mapping_length = len(mapping_config[tf_class])
@@ -216,27 +219,55 @@ def spo(request, doc_id):
 
     import_config = {"query": query_config, "mapping": mapping_config, "import_label_lengths": import_label_lengths}
 
+    import_config_dj = dict()
+    for tf_class in triple_fetcher_classes:
+        import_config_dj[tf_class] = dict()
+
+
+
+
+
+    for tf_class in import_config_dj:
+        import_config_dj[tf_class]["query"] = dict()
+        import_config_dj[tf_class]["mapping"] = dict()
+
+
+    for tf_class in import_config["query"]:
+        i = 0
+        for conf in import_config["query"][tf_class]:
+            import_config_dj[tf_class]["query"][i] = {conf : import_config["query"][tf_class][conf]}
+            i += 1
+
+    for tf_class in import_config["mapping"]:
+        i = 0
+        for conf in import_config["mapping"][tf_class]:
+            import_config_dj[tf_class]["mapping"][i] = {conf : import_config["mapping"][tf_class][conf]}
+            i += 1
+
+    print import_config_dj
+
     # Serialize graph to RDFJson
     rdfjson = graph.serialize(None, format="rdf-json")
     return render_to_response(
         'rdfedit/triples.html',
         {'rdfjson': rdfjson,
          'triple_list': triple_list,
-         'subject_set':subject_set,
-         'predicate_set':predicate_set,
-         'object_set':object_set,
-         'namespaces_dict':json.dumps(namespaces_dict),
-         'base':base,
+         'subject_set': subject_set,
+         'predicate_set': predicate_set,
+         'object_set': object_set,
+         'namespaces_dict': json.dumps(namespaces_dict),
+         'base': base,
          "triple_fetcher_classes": json.dumps(triple_fetcher_classes),
          "import_config": json.dumps(import_config),
-         "import_config_dj" : import_config},
+         "import_config_dj": import_config_dj},
         context_instance=RequestContext(request)
-    )    
-    
+    )
+
+
 def rdf(request, rdfxml_id):
     # Get RDF/XML from the database
 
-    rdfxml_object = RDF_XML.objects.get(pk = rdfxml_id)
+    rdfxml_object = RDF_XML.objects.get(pk=rdfxml_id)
     rdfxml_string = rdfxml_object.rdfxml_string
 
 
@@ -249,23 +280,18 @@ def rdf(request, rdfxml_id):
     response['Content-Disposition'] = 'attachment; filename="rdf.xml"'
 
     for doc in RDF_XML.objects.all():
-    # Make sure the DB stays clean
+        # Make sure the DB stays clean
         doc.delete()
 
     return response
 
+
 def get_triple_fetcher_classes():
-    
     # Get available classes for the triple fetcher
     sindice_query_config = json.loads(open(SINDICE_CONFIG_QUERY, 'r').read())
     triple_fetcher_classes = list()
-    
+
     for triple_fetcher_class in sindice_query_config:
         triple_fetcher_classes.append(triple_fetcher_class)
-    
-    return list(set(triple_fetcher_classes))
 
-@register.filter
-def get_item(dictionary, key):
-    return dictionary.get(key)
-    
+    return list(set(triple_fetcher_classes))

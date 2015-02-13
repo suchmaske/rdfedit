@@ -4,6 +4,7 @@
 
 {% block content %}
 
+    <!--
 
     <div id="import-config-table-wrapper">
 
@@ -20,19 +21,10 @@
                 <td>New Predicate</td>
             </tr>
 
-            {% for import_type in import_config_dj.import_label_lengths %}
-
-                <tr>
-                    <td rowspan="{{ import_config_dj.import_label_lengths|get_item:import_type }}">{{ import_type }}</td>
-
-
-
-                </tr>
-
-            {% endfor %}
         </table>
 
     </div>
+    -->
 
     <div class="triple_table_wrapper">
 
@@ -57,7 +49,8 @@
                     </td>
 
                     <td>
-                        <span id="predicate" rel="tooltip" title="{{ triple.1 }}">{{ triple.1 }}</span>
+
+                        <span id="predicate" contenteditable>{{ triple.1 }}</span>
                     </td>
 
                     <td>
